@@ -304,19 +304,19 @@ The ITS2 forward and reverse primer sequences are universal ITS2 sequences (Poch
 that have been modified to include a linker and adapter that any of the barcode/index 
 primers can then bind to, shown below:
 
-Primer name     Sequence: Adapter+Linker+Universal ITS2 F(or)R Primer
+Primer name     Sequence: Adapter/Linker+Universal ITS2 F(or)R Primer
 ------------------------------------------------------------------------------------------
-ITS2-F-miseq    TCG TCG GCA GCG TC+A GAT GTG TAT AAG AGA CAG+GTG AAT TGC AGA ACT CCG TG
+ITS2-F-miseq    TCG TCG GCA GCG TC/A GAT GTG TAT AAG AGA CAG+GTG AAT TGC AGA ACT CCG TG
 
-ITS2-R-miseq    GTC TCG TGG GCT CGG+AGA TGT GTA TAA GAG ACA G+CC TCC GCT TAC TTA TAT GCT T
+ITS2-R-miseq    GTC TCG TGG GCT CGG/AGA TGT GTA TAA GAG ACA G+CC TCC GCT TAC TTA TAT GCT T
 
 ==========================================================================================
 
-Primer Name     Sequence: Illumina F(or)R Primer+Barcode+Adapter
+Primer Name     Sequence: Illumina F(or)R Primer/Linker+Barcode+Adapter
 ------------------------------------------------------------------------------------------
-Hyb_F1_i5       AAT GAT ACG GCG ACC ACC GAG ATC TAC AC+A GTC AA+T CGT CGG CAG CGT C
+Hyb_F1_i5       AAT GAT ACG GCG ACC AC/C GAG ATC TAC AC+A GTC AA+T CGT CGG CAG CGT C
 		
-Hyb_R1_i7       CAA GCA GAA GAC GGC ATA CGA GAT+AAG CTA+GTC TCG TGG GCT CGG
+Hyb_R1_i7       CAA GCA GAA GAC GGC ATA C/GA GAT+AAG CTA+GTC TCG TGG GCT CGG
 		
 Barcoded primers that also contain the Illumina adapter needed to bind to the flow cell of
 the MiSeq platform can then be to the amplified products. Dual indexing (placing unique 
