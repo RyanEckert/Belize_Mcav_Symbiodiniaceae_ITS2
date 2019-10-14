@@ -1,8 +1,8 @@
 ################################################################################
 ### Analyzing Symbiodiniaceae ITS2 reads on FAU KoKo HPC, version 11/17/18   ###
 ### Written by Ryan Eckert (reckert2017@fau.edu)                             ###
-### adapted from pipelines developed by Eli Meyer and Carly Kenkel           ###
-### (https://github.com/Eli-Meyer/ASV_utilities) ###
+### adapted from pipelines developed by Eli Meyer and Carly Kenkel:          ###
+### (https://github.com/Eli-Meyer/ASV_utilities)                             ###
 ### (http://doi.org/10.5281/zenodo.1208684)                                  ###
 ###--------------------------------------------------------------------------###
 ###                                                                          ###
@@ -54,7 +54,7 @@ mkdir bin
 cd bin
 
 
-git clone https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/
+git clone https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV.git
 mv Symbiodiniaceae-ITS2-ASV/scripts/* .
 rm -rf Symbiodiniaceae-ITS2-ASV
 chmod +x *.py *.pl *.R
@@ -341,4 +341,5 @@ less lulu.r.log
 # be able to add it more eloquently, but I can't :)
 
 # from here on out, I'm exclusively working in R, using the script
-# "Symbiodiniaceae_ITS2_stats.R" also available from GitHub (XXX)
+# "Symbiodiniaceae_ITS2_stats.R" also available from GitHub:
+# (github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/tree/master/scripts)
