@@ -29,9 +29,11 @@ knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE}
-if (!require("pacman")) install.packages("pacman") # for rapid install if not in library
-#if(!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
-#                                                 pairwiseAdonis')
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+if (!require("BiocManager")) install.packages("BiocManager")
+if (!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
+                                                 pairwiseAdonis')
+if (!require("edgeR")) BiocManager::install("edgeR")
 pacman::p_load(car, cluster, dplyr,  dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
                multcompView, pairwiseAdonis, pgirmess, plyr, reshape, vegan)
 

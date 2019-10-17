@@ -278,9 +278,11 @@ div.tocify {
 <div id="loading-required-packages" class="section level2">
 <h2>Loading required packages</h2>
 <p>For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.</p>
-<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;) # for rapid install if not in library
-#if(!require(&quot;pairwiseAdonis&quot;)) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
-#                                                 pairwiseAdonis')
+<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;); library(pacman)
+if (!require(&quot;BiocManager&quot;)) install.packages(&quot;BiocManager&quot;)
+if (!require(&quot;pairwiseAdonis&quot;)) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
+                                                 pairwiseAdonis')
+if (!require(&quot;edgeR&quot;)) BiocManager::install(&quot;edgeR&quot;)
 pacman::p_load(car, cluster, dplyr,  dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
                multcompView, pairwiseAdonis, pgirmess, plyr, reshape, vegan)
 
