@@ -3,14 +3,15 @@ title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 date: "10/15/2019"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
     code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
+    output_file: "index.html"
 ---
     
 #About this document
@@ -477,7 +478,7 @@ divPlots
 
 ###Save as high-res images
 Finally, we will save the resulting $\alpha$-diversity plot panel as a high resoultion .eps figure. Alternatively you could save it as a HQ .tiff by simply changing the extension in the code below. 
-```{r, save alpha plots as .eps}
+```{r, save alpha plots as eps}
 ggsave("its2_diversityPlots.eps", plot = divPlots, width = 8.25, height = 10, 
        unit = "in", dpi = 600)
 ```
