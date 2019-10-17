@@ -1,6 +1,6 @@
-# Symbiodiniaceae *ITS2* amplicon sequencing
-## Ryan Eckert -- ryan.j.eckert@gmail.com
-## version: 10/16/2019  
+# Symbiodiniaceae *ITS2* amplicon sequencing  
+### Ryan Eckert – ryan.j.eckert@gmail.com  
+### version: 10/16/2019  
 
 This repository contains scripts and data associated with the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.**
 
