@@ -3,18 +3,18 @@ title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 date: "10/16/2019"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
     code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
 ---
     
 #About this document
-This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.**. Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV).  
+This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.** Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV).  
 
 If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
   
@@ -29,8 +29,8 @@ knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE}
-if (!require("pacman")) install.packages("pacman");
-if (!require("BiocManager")) install.packages("BiocManager", update = FALSE); 
+if (!require("pacman")) install.packages("pacman")
+if (!require("BiocManager")) install.packages("BiocManager", update = FALSE) 
 if (!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
                                                  pairwiseAdonis')
 if (!require("edgeR")) BiocManager::install("edgeR", update = FALSE)

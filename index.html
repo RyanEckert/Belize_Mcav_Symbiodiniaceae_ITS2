@@ -269,7 +269,7 @@ div.tocify {
 
 <div id="about-this-document" class="section level1">
 <h1>About this document</h1>
-<p>This is the code accompanies the publication <strong>Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.</strong>. Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my <a href="https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV">github</a>.</p>
+<p>This is the code accompanies the publication <strong>Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.</strong> Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my <a href="https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV">github</a>.</p>
 <p>If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. <code>setwd(&quot;~/path/to/directory/with/data&quot;)</code>).</p>
 <p>The data used for this analysis are OTUs calculated with R packages <em>dada2</em> and <em>LULU</em>. The raw Symbiodiniaceae <em>ITS2</em> sequences obtained from <em>Montastraea cavernosa</em> samples can be found in the NCBI SRA under project number XXX <XXX>. Hopefully you are able to follow along this file and find it useful to use with your own data!</p>
 </div>
@@ -278,8 +278,8 @@ div.tocify {
 <div id="loading-required-packages" class="section level2">
 <h2>Loading required packages</h2>
 <p>For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.</p>
-<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;);
-if (!require(&quot;BiocManager&quot;)) install.packages(&quot;BiocManager&quot;, update = FALSE); 
+<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;)
+if (!require(&quot;BiocManager&quot;)) install.packages(&quot;BiocManager&quot;, update = FALSE) 
 if (!require(&quot;pairwiseAdonis&quot;)) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
                                                  pairwiseAdonis')
 if (!require(&quot;edgeR&quot;)) BiocManager::install(&quot;edgeR&quot;, update = FALSE)
