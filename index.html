@@ -278,12 +278,12 @@ div.tocify {
 <div id="loading-required-packages" class="section level2">
 <h2>Loading required packages</h2>
 <p>For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.</p>
-<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;); library(pacman)
-if (!require(&quot;BiocManager&quot;)) install.packages(&quot;BiocManager&quot;)
+<pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;);
+if (!require(&quot;BiocManager&quot;)) install.packages(&quot;BiocManager&quot;, update = FALSE); 
 if (!require(&quot;pairwiseAdonis&quot;)) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
                                                  pairwiseAdonis')
-if (!require(&quot;edgeR&quot;)) BiocManager::install(&quot;edgeR&quot;)
-pacman::p_load(car, cluster, dplyr,  dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
+if (!require(&quot;edgeR&quot;)) BiocManager::install(&quot;edgeR&quot;, update = FALSE)
+pacman::p_load(car, cluster, dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
                multcompView, pairwiseAdonis, pgirmess, plyr, reshape, vegan)
 
 #setting seed allows randomized processes to be repeated later
@@ -1462,7 +1462,7 @@ apply(its2NormPerc[, c(4:(ncol(its2NormPerc)))], 1, function(x) {
 <h2>Add plot order to data frame</h2>
 <p>I added an additional column to sort better for the stacked barplot. This was just a work around to get the <code>facet_grid()</code> function to play nice with our data. I added a coulumn “barPlotOrder” and for each population I filled in a series 1:n foreach sample at each Site:Depth combo, so now there’s no large blank expanses on the plot.</p>
 <pre class="r"><code>its2ra = its2NormPerc
-sampleCounts = count(its2ra, c('Site','Depth'))
+sampleCounts = plyr::count(its2ra, c('Site','Depth'))
 meltedList = melt(lapply(sampleCounts$freq,function(x){c(1:x)}))
 its2ra$barPlotOrder = meltedList$value
 colnames(its2ra)[c(5:ncol(its2ra)-1)] = c(&quot;sq01_C3&quot;, &quot;sq10_C3&quot;, &quot;sq11_C3g&quot;,&quot;sq14_C3g&quot;, &quot;sq17_C3g&quot;, 

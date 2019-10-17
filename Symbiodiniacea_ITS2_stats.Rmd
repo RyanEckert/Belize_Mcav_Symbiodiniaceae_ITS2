@@ -29,12 +29,12 @@ knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE}
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-if (!require("BiocManager")) install.packages("BiocManager")
+if (!require("pacman")) install.packages("pacman");
+if (!require("BiocManager")) install.packages("BiocManager", update = FALSE); 
 if (!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
                                                  pairwiseAdonis')
-if (!require("edgeR")) BiocManager::install("edgeR")
-pacman::p_load(car, cluster, dplyr,  dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
+if (!require("edgeR")) BiocManager::install("edgeR", update = FALSE)
+pacman::p_load(car, cluster, dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
                multcompView, pairwiseAdonis, pgirmess, plyr, reshape, vegan)
 
 #setting seed allows randomized processes to be repeated later
@@ -791,7 +791,7 @@ Everything adds up to 1, this is good! The code works.
 I added an additional column to sort better for the stacked barplot. This was just a work around to get the ```facet_grid()``` function to play nice with our data. I added a coulumn "barPlotOrder" and for each population I filled in a series 1:n foreach sample at each Site:Depth combo, so now there's no large blank expanses on the plot.
 ```{r, add plot order to df}
 its2ra = its2NormPerc
-sampleCounts = count(its2ra, c('Site','Depth'))
+sampleCounts = plyr::count(its2ra, c('Site','Depth'))
 meltedList = melt(lapply(sampleCounts$freq,function(x){c(1:x)}))
 its2ra$barPlotOrder = meltedList$value
 colnames(its2ra)[c(5:ncol(its2ra)-1)] = c("sq01_C3", "sq10_C3", "sq11_C3g","sq14_C3g", "sq17_C3g", 
