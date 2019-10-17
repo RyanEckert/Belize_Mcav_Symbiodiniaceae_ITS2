@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan Eckert – ryan.j.eckert@gmail.com" />
 
-<meta name="date" content="2019-10-15" />
+<meta name="date" content="2019-10-16" />
 
 <title>Symbiodiniaceae ITS2 community analyses</title>
 
@@ -262,15 +262,15 @@ div.tocify {
 
 <h1 class="title toc-ignore">Symbiodiniaceae <em>ITS2</em> community analyses</h1>
 <h4 class="author">Ryan Eckert – <a href="mailto:ryan.j.eckert@gmail.com">ryan.j.eckert@gmail.com</a></h4>
-<h4 class="date">10/15/2019</h4>
+<h4 class="date">10/16/2019</h4>
 
 </div>
 
 
 <div id="about-this-document" class="section level1">
 <h1>About this document</h1>
-<p>This is the code accompanies the publication <strong>Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.</strong>. Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my <a href="https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV">github</a>.<br />
-If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. <code>setwd(&quot;~/path/to/directory/with/data&quot;)</code>).</p>
+<p>This is the code accompanies the publication <strong>Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.</strong>. Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my <a href="https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV">github</a>.</p>
+<p>If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. <code>setwd(&quot;~/path/to/directory/with/data&quot;)</code>).</p>
 <p>The data used for this analysis are OTUs calculated with R packages <em>dada2</em> and <em>LULU</em>. The raw Symbiodiniaceae <em>ITS2</em> sequences obtained from <em>Montastraea cavernosa</em> samples can be found in the NCBI SRA under project number XXX <XXX>. Hopefully you are able to follow along this file and find it useful to use with your own data!</p>
 </div>
 <div id="basic-setup-of-r-environment-and-data" class="section level1">
@@ -1084,8 +1084,9 @@ divPlots</code></pre>
 <h2>Perform PCoA</h2>
 <p>This is the actual PCoA step</p>
 <pre class="r"><code>its2Mds = cmdscale(its2Dist, eig = TRUE, x.ret = TRUE)</code></pre>
-<div id="determine-percent-variation-captured-on-each-axis" class="section level3">
-<h3>Determine percent variation captured on each axis</h3>
+</div>
+<div id="determine-percent-variation-captured-on-each-axis" class="section level2">
+<h2>Determine percent variation captured on each axis</h2>
 <p>Calculate the eigenvalues so later we can figure out % variation shown on each Principal Coordinate</p>
 <pre class="r"><code>its2Var = round(its2Mds$eig/sum(its2Mds$eig)*100, 1)
 its2Var</code></pre>
@@ -1106,8 +1107,10 @@ its2Var</code></pre>
 ## [197]  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
 ## [211]  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
 ## [225]  0.0  0.0 -0.1 -0.1 -0.1 -0.2 -0.3 -0.4 -0.6</code></pre>
-<pre class="r"><code>####formatting the data so we can plot nicely with ggpPlot
-its2Values = its2Mds$points
+</div>
+<div id="format-data-to-plot" class="section level2">
+<h2>Format data to plot</h2>
+<pre class="r"><code>its2Values = its2Mds$points
 
 its2Values =as.data.frame(its2Values, sample = rownames(its2Values))
 its2Pcoa = data.frame(sample = rownames(its2Values), site = as.factor(its2Norm$Site),
@@ -1123,11 +1126,9 @@ head(its2Pcoa)</code></pre>
 ## 5    112   TR    10 -0.03216465 -0.003956257
 ## 6    113   TR    10 -0.02452031 -0.006515757</code></pre>
 </div>
-</div>
-<div id="plot-the-pcoa" class="section level2">
-<h2>Plot the PCoA</h2>
-<pre class="r"><code># plotting PCoA with ggPlot
-its2PcoaA = ggplot(its2Pcoa, aes(x = PCo1, y = PCo2)) +
+<div id="pcoa-biplot" class="section level2">
+<h2>PCoA biplot</h2>
+<pre class="r"><code>its2PcoaA = ggplot(its2Pcoa, aes(x = PCo1, y = PCo2)) +
             geom_hline(yintercept = 0, color = &quot;gray90&quot;, size = 0.5) +
             geom_vline(xintercept = 0, color = &quot;gray90&quot;, size = 0.5) + 
             geom_point(aes(shape = factor(depth), size = depth, fill = site), 
@@ -1559,8 +1560,6 @@ OTUplot</code></pre>
 <h2>Cheking dispersion</h2>
 <p>Using <code>betadisper()</code> in <em>vegan</em> to look at multivariate homogeneity of dispersion between sites and depths. This is using Bray-Curtis similarity.</p>
 <pre class="r"><code>anova(betadisper(its2Dist, its2Norm$Depth))</code></pre>
-<pre><code>## Warning in betadisper(its2Dist, its2Norm$Depth): some squared distances are
-## negative and changed to zero</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Response: Distances
@@ -1693,8 +1692,6 @@ head(its2Norm2)</code></pre>
 <h3>Run PERMANOVA on subset of data</h3>
 <pre class="r"><code>its2Dist2 = vegdist(its2Norm2[, c(4:ncol(its2Norm2))], method = &quot;bray&quot;)
 anova(betadisper(its2Dist2, its2Norm2$Depth))</code></pre>
-<pre><code>## Warning in betadisper(its2Dist2, its2Norm2$Depth): some squared distances
-## are negative and changed to zero</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Response: Distances

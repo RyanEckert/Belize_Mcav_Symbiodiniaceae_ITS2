@@ -1,21 +1,21 @@
 ---
 title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
-date: "10/15/2019"
+date: "10/16/2019"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
-    output_file: "index.html"
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
     
 #About this document
 This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.**. Here you will find all the code to repeat the analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV).  
+
 If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
   
 The data used for this analysis are OTUs calculated with R packages *dada2* and *LULU*. The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number XXX <XXX>. Hopefully you are able to follow along this file and find it useful to use with your own data!  
@@ -24,7 +24,11 @@ The data used for this analysis are OTUs calculated with R packages *dada2* and 
 
 ##Loading required packages
 For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
-```{r, environment setup, include = TRUE, message = FALSE, warning = FALSE}
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r, load packages, include = TRUE, message = FALSE, warning = FALSE}
 if (!require("pacman")) install.packages("pacman") # for rapid install if not in library
 #if(!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
 #                                                 pairwiseAdonis')
@@ -503,14 +507,16 @@ This is the actual PCoA step
 its2Mds = cmdscale(its2Dist, eig = TRUE, x.ret = TRUE)
 ```
 
-###Determine percent variation captured on each axis 
+##Determine percent variation captured on each axis 
 Calculate the eigenvalues so later we can figure out % variation shown on each Principal Coordinate
-```{r, }
+```{r, calculate eigenvalues}
 
 its2Var = round(its2Mds$eig/sum(its2Mds$eig)*100, 1)
 its2Var
+```
 
-####formatting the data so we can plot nicely with ggpPlot
+##Format data to plot
+```{r, format pcoa to plot}
 its2Values = its2Mds$points
 
 its2Values =as.data.frame(its2Values, sample = rownames(its2Values))
@@ -521,9 +527,8 @@ its2Pcoa = data.frame(sample = rownames(its2Values), site = as.factor(its2Norm$S
 head(its2Pcoa)
 ```
 
-##Plot the PCoA
+##PCoA biplot
 ```{r, plot PCoA, fig.show = 'hide'}
-# plotting PCoA with ggPlot
 its2PcoaA = ggplot(its2Pcoa, aes(x = PCo1, y = PCo2)) +
             geom_hline(yintercept = 0, color = "gray90", size = 0.5) +
             geom_vline(xintercept = 0, color = "gray90", size = 0.5) + 
@@ -911,7 +916,7 @@ its2Norm2 = cbind(goods2[,c(2:4)], its2TMM)
 head(its2Norm2)
 ```
 ###Run PERMANOVA on subset of data
-```{r, }
+```{r, permanova no deep}
 its2Dist2 = vegdist(its2Norm2[, c(4:ncol(its2Norm2))], method = "bray")
 anova(betadisper(its2Dist2, its2Norm2$Depth))
 
@@ -923,7 +928,7 @@ Depth is still has a significant effect on community structure
 
 ###Pairwise PERMANOVA
 Let' see where differences lie across depth using pairwise permanova again.
-```{r, }
+```{r, pw permanova no deep}
 its2PWAdonis2 = pairwise.adonis(its2Dist2, factors = its2Norm2$Depth,
                                 perm = 9999, p.adjust.m = "BH")
 its2PWAdonis2
