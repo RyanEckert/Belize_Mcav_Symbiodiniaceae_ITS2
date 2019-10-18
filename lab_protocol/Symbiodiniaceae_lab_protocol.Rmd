@@ -3,15 +3,16 @@ title: "Symbiodiniaceae *ITS2* Sequencing Library Preparation"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 date: "version: 10/17/2019"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     theme: flatly
     code_folding: hide
     toc: yes
     toc_depth: 3
     toc_float: yes
+    keep_md: no
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 ```{r, setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
