@@ -1,0 +1,21 @@
+---
+title: "Symbiodiniaceae *ITS2* sequence read processing"
+author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
+date: "version: 10/18/2019"
+output:
+  html_document:
+    theme: flatly
+    code_folding: show
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#THIS PAGE IS CURRENTLY UNDER CONSTRUCTION
