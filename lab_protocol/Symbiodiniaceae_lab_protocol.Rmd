@@ -1,0 +1,262 @@
+---
+title: "Symbiodiniaceae *ITS2* Sequencing Library Preparation"
+author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
+date: "version: 10/17/2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  html_document:
+    theme: flatly
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+```{r, setup, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(kableExtra)
+
+supplies = read.csv("supplies.csv")
+ctab = read.csv("ctab.csv")
+reagents = read.csv("reagents.csv")
+etbrGel = read.csv("etbrGel.csv")
+sybrGel = read.csv("sybrGel.csv")
+barcodeMM = read.csv("barcodeMM.csv")
+its2MM = read.csv("its2MM.csv")
+its2PCR = read.csv("its2PCR.csv")
+bcPCR = read.csv("bcPCR.csv")
+its2Primers = read.csv("its2Primers.csv")
+bcPrimers = read.csv("bcPrimers.csv")
+```
+#Symbiodiniaceae CTAB DNA Extraction Protocol 
+
+Revised from [Mieog et al. (2009)](https://doi.org/10.1111/j.1755-0998.2008.02222.x) and http://ccb.ucr.edu/lab_protocols.html  
+
+This protocol is used to extract high quality genomic DNA from both coral host and Symbiodiniaceae spp. The resulting DNA should be sufficient for downstream PCR and high-thoughout sequencing. This protocol was utilized to examine Symbiodiniaceae community structure across depth through *ITS2* metabarcoding in **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.**   
+Additionally, the DNA extraction and clean-up were used in **[Eckert, R. J., Studivan, M. S., and Voss, J. D. (2019). Populations of the coral species *Montastraea cavernosa* on the Belize Barrier Reef lack vertical connectivity. Sci. Rep. 9, 7200.](https://doi.org/10.1038/s41598-019-43479-x)** to examine coral host population genetic structure.
+
+##Supplies
+
+The following supplies are necessary to perform a round of 24 extractions.  
+
+```{r, supplies table}
+kable(supplies) %>%
+  kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
+                position = 'left') %>%
+  column_spec(1, width = "16em") %>%
+  column_spec(2, width = "18em") %>%
+  column_spec(3, width = "10em") %>%
+  row_spec(2, hline_after = TRUE)
+```
+
+##Reagent recipes
+Recipes for making ectraction buffer and associated stock solutions necessary for CTAB gDNA extraction follow.
+###2X CTAB extraction buffer
+Use heat and stirring to dissolve CTAB into solution before adding NaCl. Make CTAB buffer just prior to extractions. Can keep at room temperature for several days.
+```{r, ctab buffer, fig.align = 'left'}
+kable(ctab, col.names = (c("Reagent","per 20 mL", "Target"))) %>%
+  kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = 
+                FALSE, position = 'left') %>%
+  column_spec(1, width = "33em") %>%
+  column_spec(2, width = "10em")
+```
+  
+###Reagent stock recipes             
+```{r, reagent stocks}
+kable(reagents, col.names = (c("Reagent","per 100 mL"))) %>%
+    kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width 
+                  = FALSE, position = 'left') %>%
+  column_spec(1, width = "13em") %>%
+  column_spec(2, width = "27em")
+```
+ 
+##Genomic DNA Extraction
+1. Prepare CTAB extraction buffer just prior to use, do not add proteinase K.
+2. Scrape tissue from coral fragment and place into a 2 mL tube with 0.1 mL (~ 0.075 g) of 0.5 mm glass beads.
+3. Add 800 µL CTAB extraction buffer.
+4. Add 0.8 µL Proteinase K. Seal tubes with parafilm. Invert to mix. 
+5. Bead beat for 2--3 mins (6 M/s, three 45 sec intervals w/ 2 min cool down between).
+6. Incubate at 60 °C for 90 min while mixing.
+7. Add 800 µL Chloroform:Isoamyl  Alcohol (24:1). Invert to mix. 
+8. Mix and centrifuge at 20,000 x *g* for 15 mins at 4 ˚C.
+9. Transfer aqueous phase to new 2 mL tube (600 µL then 150 µL), taking care not to disturb interphase layer. 
+10. Add 800 µL cold (-20 ˚C) Isopropanol.
+11. Mix and incubate for 20 min at -20 ˚C.
+12. Centrifuge at 20,000 x *g* for 20 min at 4 ˚C.
+13. Carefully pour off supernatant. 
+14. Add 150 µL of 70% Ethanol at room temperature. Invert to mix.
+15. Centrifuge at 20,000 x *g* for 5 min at 4 ˚C.
+16. Remove supernatant (pour off, quick spin, pipette off remaining avoiding pellet) and dry inverted on Kimwipe for 15 min at room temperature. 
+17. Elute in 100--200 µL of 1X TE pH 8.0.
+18. Incubate at 55 ˚C for 10 min.  
+
+#Cleaning genomic DNA
+After extracting genomic DNA, Zymo DNA Clean & Concentrator-5 (D4014) is used to clean DNA 
+and remove inhibitors prior to running a PCR.  
+**Prior to first use add ethanol to Wash Buffer and label bottle.**  
+1. Nanodrop DNA for concentration. Prepare 0.6 mL tubes with 5µg (or less) DNA in 100 µL total volume 1X TE to be cleaned.
+2. Set Elution Buffer for elution step in heat block at 60--70 °C.
+3. In a 2 mL tube add 2:1 volume of Binding Buffer:DNA (200 µL) to each volume of genomic 
+DNA and vortex thoroughly.
+4. Transfer the mixture to a provided Zymo-Spin Column in a collection tube.
+5. Centrifuge 10,000 x *g* for 30 sec at room temperature. Discard flow through.
+6. Add 200μL DNA Wash Buffer to the column. Centrifuge at 10,000 x *g* for 1 min at room 
+temperature. Repeat.
+7. Transfer the column to a new labeled 1.5 mL tube. Elute by adding 20 µL of Elution 
+Buffer directly to the column matrix and incubate at room temperature for 3–5 min. 
+Centrifuge for 30 seconds to elute DNA.
+8. Check DNA quality with Nanodrop and quantify DNA flourescently (e.g. Qubit) and prepare 10 ng/µL dilutions.  
+
+#Symbiodiniaceae *ITS2* amplification
+Adapted from [Klepac et al. (2013)](https://doi.org/10.3354/meps11369). 
+We want to try to avoid over-amplification, so we will start with 22 cycles and check on an agarose gel before final extension.  
+Starting with **clean** DNA template that was quantified **fluorescently** will greatly increase amplification success. 
+##*ITS2* PCR
+```{r, its2 master mix}
+kable(its2MM, col.names = (c("Reagent","1 rxn"))) %>%
+    kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE,
+                  position = 'float_left') %>%
+  column_spec(1, width = "12em") %>%
+  column_spec(2, width = "15em") %>%
+  row_spec(8, bold = TRUE) %>%
+  add_header_above(c("Master mix recipe"=2), line = FALSE, font_size = "Large", align = 'left')
+
+kable(its2PCR, col.names = (c("","",""))) %>%
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE,
+                  position = 'right') %>%
+  column_spec(1:2, width = "5em") %>%
+  row_spec(2:4, bold = TRUE, background = "#2C3E50", color = "white") %>%
+  row_spec(0, bold = FALSE) %>%
+  add_header_above(c("PCR profile"=3), line = FALSE, font_size = "Large", align = 'left')
+```
+<br><br><br><br><br> 
+
+1. Amplify samples with the *ITS2* forward and reverse primers (see ITS2-F-miseq and ITS2-R-miseq under [Primer sequence information](#primer-sequence-information)) using cycle checks to obtain a faint but distinct band (Should take ~22 cycles). Avoid over-amplification, don't run  more than 28 cycles. To add cycles, place samples back into thermocycler and run for the additional number of cycles (no initial heating or final exstension steps).
+2. Visualize on a gel using 3 µL of PCR product. If band is still not visible after checked on 3 gels, redo reaction using appropriate number of cycles.
+3. Run a final extenstion on all samples.
+3. Clean PCR product with GeneJET PCR Purification Kit.
+
+
+##Sodium Borate/EtBr 1.5% Agarose Gel Recipe 
+```{r, etbr gel}
+kable(etbrGel, col.names = (c("Reagent","For 300 mL gel"))) %>%
+    kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE,
+                  position = 'left') %>%
+  column_spec(1, width = "12em") %>%
+  column_spec(2, width = "8em")
+```          
+
+Add EtBr just before pouring gel (55--60 ˚C)   
+Use 3 µL PCR Product and 2 µL loading dye. Use 3 µL Ladder and 2 µL loading dye for marker wells.
+Run gel at 150 V for 15–20 min. You should see a distinct band at ~400 bp.
+
+##Cleaning PCR products  
+Here we're cleaning with ThermoScientific GeneJET.  
+You can clean your PCR products with any commercially available PCR purification kit.
+Zymo DCC-5 can also be used to clean PCR products by changing the binding buffer:DNA ratio to 5:1.  
+
+**Prior to first use add ethanol to Wash Buffer and label bottle.**  
+
+1. Add 1:1 volume of Binding Buffer:PCR product (27 µL). Mix thoroughly. Check color 
+   of solution after adding Binding Buffer. Yellow indicates optimal pH for DNA binding. 
+   If orange or violet, add 10 µL of 3M sodium acetate (pH 5.2) and mix.
+2. Transfer reaction mixture/binding buffer solution to GeneJET purification column.
+3. Centrifuge at 12,000 x *g* for 1 min at room temperature. Discard flow-through.
+4. Add 700 µL of Wash Buffer to purification column.
+5. Centrifuge at 12,500 x *g* for 1 min at room temperature. Discard flow-through.
+6. Centrifuge empty column for an additional 1 minute to completely remove Wash Buffer as
+   residual ethanol may inhibit subsequent reactions.  
+7. Transfer purification column to 1.5 mL microcentrifuge tube. Add desired volume of 
+   Elution Buffer.
+      a. 30 µL used for PCR products after adding universal ITS2 primers with linkers. 
+      b. 40 µL used for PCR products after adding barcode and MiSeq adapter primers.  
+8. Allow to sit at room temperature for 1 minute, then centrifuge at 13,000 x *g* for 1 min 
+   at room temperature.  
+9. Nanodrop cleaned sample and dilute with Elution Buffer for a final concentration of 
+   10 ng/µL.  
+   
+#Symbiodiniaceae *ITS2* library barcoding
+Now run a short PCR (4--6 cycles maximum) to incorporate a unique combination of indexed Illumina p5 and p7 adapters to each sample to pool for sequencing.  
+
+##Barcoding PCR                                    
+```{r, barcode master mix}
+kable(barcodeMM, col.names = (c("Reagent","1 rxn"))) %>%
+    kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE,
+                  position = 'float_left') %>%
+  column_spec(1, width = "10em") %>%
+  column_spec(2, width = "16em") %>%
+  row_spec(8, bold = TRUE) %>%
+  add_header_above(c("Master mix recipe"=2), line = FALSE, font_size = "Large", align = 'left')
+
+kable(bcPCR, col.names = (c("","",""))) %>%
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE,
+                  position = 'right') %>%
+  column_spec(1:2, width = "5em") %>%
+  column_spec(3, width = "7em") %>%
+  row_spec(2:4, bold = TRUE, background = "#2C3E50", color = "white") %>%
+  row_spec(0, bold = FALSE) %>%
+  add_header_above(c("PCR profile"=3), line = FALSE, font_size = "Large", align = 'left')
+```  
+<br><br><br><br><br><br>
+
+1. Use cleaned and diluted samples in a PCR to incorporate barcoded MiSeq-adapter primers (see [Primer sequence information](#primer-sequence-information) for information on indexed primers).  
+2. Visualize on a gel. Once all samples are run on the same gel, “eyeball” product and decide how much of sample product to pool into final sample.  
+    a. Start with 5 µL of sample for the brightest bands, then use 10 µL for samples with bands that are half as bright, etc.  
+3. Clean pooled samples using Thermo Scientific GeneJET PCR Purification Kit. Elute with 40 µL Elution Buffer.  
+4. Run 20--40 µL of eluted sample on gel. Should get a single band approximately 500 bp. 
+
+##Sodium Borate/SYBR Green 2% Agarose Gel Recipe #
+
+```{r, sybr gel}
+kable(sybrGel, col.names = (c("Reagent","For 300 mL gel"))) %>%
+    kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
+                  position = 'left') %>%
+  column_spec(1, width = "12em") %>%
+  column_spec(2, width = "8em")
+```
+Add SYBR Green just before pouring gel (60--55 ˚C) 	
+Use 20–40 µL PCR Product and 10 µL loading dye. Use 6 µL Ladder and 10 µL loading dye for marker wells.
+Run gel at 80 V for ~90 min. This should give good separation of ladder and help with size selection.  
+
+## Gel extractions
+1. Excise bands, removing as much of the surrounding agarose as possible, and place into a 1.5 mL tube.
+XXX  
+
+#*ITS2* amplicon analyses
+All necessary data and code walkthroughs fot Symbiodinaceae *ITS2* amplicon analyses:  
+[Trimming and filtering of sequencing reads](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats/seq_processing)  
+[OTU processing](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/otus)  
+[Statistical analyses of OTUs](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats)  
+
+#Primer sequence information
+
+This protocol was developed to reduce sequencing costs by giving each sample a unique “barcode” or index sequence so that samples can be pooled and run as a single sample on the MiSeq platform. 
+
+The ITS2 forward and reverse primer sequences are universal ITS2 sequences ( [Pochon et al., 2001](doi.org/10.1007/s002270100674)) that have been modified to include a linker and adapter that any of the barcode/index primers can then bind to, shown below:  
+
+```{r, its2 primer sequences}
+kable(its2Primers, col.names = (c("Primer","Sequence: 5'-Universal adapter + ITS2 F(or)R -3'"))) %>%
+  kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
+                position = 'left') %>%
+  column_spec(1, width = "8em") %>%
+  column_spec(2, width = "38em")
+```  
+    
+Barcoded primers that also contain the Illumina adapter needed to bind to the flow cell of the MiSeq platform can then be added to the amplified products. Dual indexing (placing unique barcode sequences on both the forward and reverse primers is a cost-efficient way to include more samples while purchasing less barcode primers (i.e. 20 forward and 20 reverse barcode primers can label up to 400 unique samples). Primers used for this publication can be found on [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2).  
+```{r, bc primer sequences}
+kable(bcPrimers, col.names = (c("Primer","Sequence: 5'-Illumina p5(or)p7 + Index + Universal adapter-3'"))) %>%
+  kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
+                position = 'left') %>%
+  column_spec(1, width = "7em") %>%
+  column_spec(2, width = "32em")
+```
+
+For more primer and barcode examples:
+https://wikis.utexas.edu/display/GSAF/Illumina+-+all+flavors
+https://wikis.utexas.edu/display/GSAF/rRNA+bacterial+gene+and+fungal+ITS+metagenomics+samples
+
+#

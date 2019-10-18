@@ -3,14 +3,14 @@ title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 date: "version: 10/17/2019"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
     
 #About this document
@@ -28,17 +28,18 @@ For the following analyses we will require the use of a number of different R pa
 knitr::opts_chunk$set(warning = FALSE)
 ```
 
-```{r, load packages, include = TRUE, message = FALSE, warning = FALSE}
+```{r, load packages, include = TRUE, warning = TRUE}
+#, message = FALSE}
 if (!require("pacman")) install.packages("pacman")
-if (!require("BiocManager")) install.packages("BiocManager", update = FALSE) 
-if (!require("pairwiseAdonis")) pacman::p_load_gh('pmartinezarbizu/pairwiseAdonis/
-                                                 pairwiseAdonis')
-if (!require("edgeR")) BiocManager::install("edgeR", update = FALSE)
-pacman::p_load(car, cluster, dunn.test, edgeR, ggplot2, ggpubr, labdsv, MCMC.OTU, 
-               multcompView, pairwiseAdonis, pgirmess, plyr, reshape, vegan)
+#if (!require("BiocManager")) install.packages("BiocManager", update = FALSE, quiet = TRUE)
+#if (!require("pairwiseAdonis"))
+pacman::p_load("BiocManager", "car", "cluster", "dunn.test", "edgeR", "ggpubr", "labdsv", 
+               "MCMC.OTU", "multcompView", "pgirmess", "plyr", "reshape", "vegan")
 
-#setting seed allows randomized processes to be repeated later
-set.seed(3254)
+pacman::p_load_gh("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+
+if (!require("edgeR")){BiocManager::install("edgeR", update = FALSE) 
+  library(edgeR)}
 ```
 
 ##Creating a color palette to use for our data
@@ -214,7 +215,6 @@ We can take all of our $\alpha$-diversity metrics and plot them all into a singl
 
 ###Plot species richness by site
 ```{r, Plotting species richness by site, fig.show = 'hide'}
-
 its2RichPlotS = ggplot(data = its2Div, aes(x = Site, y = richness)) +
                 geom_point(aes(fill = Depth),shape = 21, color = "gray20", size = 2,
                            position = position_jitterdodge()) +
@@ -512,7 +512,6 @@ its2Mds = cmdscale(its2Dist, eig = TRUE, x.ret = TRUE)
 ##Determine percent variation captured on each axis 
 Calculate the eigenvalues so later we can figure out % variation shown on each Principal Coordinate
 ```{r, calculate eigenvalues}
-
 its2Var = round(its2Mds$eig/sum(its2Mds$eig)*100, 1)
 its2Var
 ```
@@ -589,6 +588,7 @@ First we have to run the calculations for the nMDS.
 This is similar to PCoA, but can be scaled freely and uses an iterative process.
 We'll run it with 50 iterations, which should be enough to arrive at a solution.
 ```{r, nmds, results = 'hide'}
+set.seed(694)
 its2Nmds = metaMDS(its2Norm[4:ncol(its2Norm)], try = 50)
 its2Nmds
 ```
@@ -691,6 +691,8 @@ Nothing unusual here, neither the highest nor the lowest sequencing depth of all
 ##nMDS without outlying samples
 Same idea as above, just with the new data lacking 10 C3g dominated samples. This way we can see if these samples are skewing our plot and obscuring a larger pattern in rest of the data.
 ```{r, nmds no outliers, results = 'hide', fig.show = 'hide'}
+set.seed(694)
+
 its2Nmds2 = metaMDS(itsNoOut[4:ncol(itsNoOut)], try = 50)
 its2Nmds2
 
@@ -802,9 +804,8 @@ head(its2ra)
 ```
 
 ##Create OTU stack for plotting
-Stack the OTU data and adjest our columns and factor names for plotting
+Stack the OTU data and adjust columns and factor names for plotting
 ```{r, otu stack}
-
 gss = otuStack(its2ra, count.columns = c(5:length(its2ra[1, ])),
                condition.columns = c(1:4))[1:2330,] # remove summ rows
 
@@ -870,6 +871,7 @@ Symbiodiniaceae $\beta$-diversity across Site and Depth based on our OTUs.
 ##Cheking dispersion 
 Using ```betadisper()``` in *vegan* to look at multivariate homogeneity of dispersion between sites and depths. This is using Bray-Curtis similarity.
 ```{r, betadispersion}
+set.seed(694)
 anova(betadisper(its2Dist, its2Norm$Depth))
 ```
 Dispersion is heteroschedastic, but PERMANOVA is robust to deviations in 
@@ -880,6 +882,7 @@ Now let's see how different communities are from each other with PERMANOVA.
 We will utilize the ```adonis()``` function in *vegan*.
 We will use Bray-Curtis similarity for our distance matrix and run a total 0f 9,999 permutations, and test the effects of Site, Depth, and the interaction between Site and Depth.
 ```{r, permanova}
+set.seed(694)
 its2Adonis = adonis(its2Norm[, c(4:ncol(its2Norm))] ~ Depth*Site, 
                      data = its2Norm, permutations = 9999, method = "bray")
 its2Adonis
@@ -890,6 +893,7 @@ We see that **Depth** has a signifcant effect on Symbiodiniaceae community struc
 Since we found that Depth was a significant factor in our PERMANOVA we can now use pairwise PERMANOVA to reveal where differences occur across depth.
 This utilizes the package *pairwiseAdonis*, where we will again use Bray-Curtis similarity and 9,999 permutations. We also have added false discovery rate (FDR) corrections since we are perfoming multiple comparisons.
 ```{r, pairwise permanova}
+set.seed(694)
 its2PWAdonis = pairwise.adonis(its2Norm[, c(4:ncol(its2Norm))],
                   factors = its2Norm$Depth, sim.method = "bray", 
                   p.adjust.m = "BH", perm = 9999)
@@ -919,6 +923,7 @@ head(its2Norm2)
 ```
 ###Run PERMANOVA on subset of data
 ```{r, permanova no deep}
+set.seed(694)
 its2Dist2 = vegdist(its2Norm2[, c(4:ncol(its2Norm2))], method = "bray")
 anova(betadisper(its2Dist2, its2Norm2$Depth))
 
@@ -931,6 +936,7 @@ Depth is still has a significant effect on community structure
 ###Pairwise PERMANOVA
 Let' see where differences lie across depth using pairwise permanova again.
 ```{r, pw permanova no deep}
+set.seed(694)
 its2PWAdonis2 = pairwise.adonis(its2Dist2, factors = its2Norm2$Depth,
                                 perm = 9999, p.adjust.m = "BH")
 its2PWAdonis2
@@ -963,7 +969,8 @@ Now that we have our data setup correctly we can create the GLMM
 
 ###Fitting the model
 Here we are using Depth as a fixed effect and running 10^6 iterations with a 5000 burn-in period.
-```{r, results = 'hide'}
+```{r, mcmcglmm, results = 'hide', message = FALSE}
+set.seed(694)
 its2MmD = mcmc.otu(fixed = "Depth", data = glmStack,
                    nitt=100000, thin=25, burnin=5000)
 ```
@@ -999,7 +1006,7 @@ its2glmPlotA = ggplot(its2MCMCglmD, aes(x = Depth, y = mean, group = otu,
                                     lwd = 0.6, width = 0.5, 	position = pd) +
                       geom_line(aes(group = otu), lwd = 0.6, position = pd)+
                       geom_point(aes(group = otu), position = pd, size = 2.5)+
-                      scale_color_manual(values = its2ColPal[c(1,2,4:8,10)], 
+                      scale_color_manual(values = its2ColPal [c(1,2,4:8,10)], 
                                          name = "OTU_Clade type") +
                       xlab("Depth")+
                       ylab("log10(proportion)") +

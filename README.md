@@ -8,4 +8,10 @@ Protocols and pipelines adapted from [Meiog et al. 2009](https://doi.org/10.1111
 
 Bioperl scripts for trimming and filtering from [Eli-Meyer](https://github.com/Eli-Meyer/ASV_utilities)  
 
-Statistical analysis walkthrough can be found [here](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/)
+Lab protocol for DNA extraction and amplification [walkthgough](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)  
+
+Sequencing read trimming and filtering [walkthrough]() {UNDER CONSTRUCTION}
+
+OTU calculation [walkthrough]() {UNDER CONSTRUCTION}
+
+Statistical analysis [walkthrough](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats)
