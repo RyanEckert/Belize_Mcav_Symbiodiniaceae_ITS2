@@ -4,6 +4,7 @@ author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 date: "version: 10/17/2019"
 output:
   html_document:
+    theme: flatly
     code_folding: show
     toc: yes
     toc_depth: 3
@@ -29,10 +30,7 @@ knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r, load packages, include = TRUE, warning = TRUE}
-#, message = FALSE}
 if (!require("pacman")) install.packages("pacman")
-#if (!require("BiocManager")) install.packages("BiocManager", update = FALSE, quiet = TRUE)
-#if (!require("pairwiseAdonis"))
 pacman::p_load("BiocManager", "car", "cluster", "dunn.test", "edgeR", "ggpubr", "labdsv", 
                "MCMC.OTU", "multcompView", "pgirmess", "plyr", "reshape", "vegan")
 
