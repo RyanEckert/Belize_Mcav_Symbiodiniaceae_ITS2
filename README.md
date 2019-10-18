@@ -8,7 +8,7 @@ Protocols and pipelines adapted from [Meiog et al. 2009](https://doi.org/10.1111
 
 Bioperl scripts for trimming and filtering from [Eli-Meyer](https://github.com/Eli-Meyer/ASV_utilities)  
 
-Lab protocol for DNA extraction and amplification [walkthgough](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)  
+Lab protocol for DNA extraction and amplification [walkthrough](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)  
 
 Sequencing read trimming and filtering [walkthrough]() {UNDER CONSTRUCTION}
 
