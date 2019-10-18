@@ -14,6 +14,8 @@ output:
     toc: yes
     toc_depth: '3'
 ---
+<br>
+
 ```{r, setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -276,6 +278,18 @@ From [Eli Meyer](https://github.com/Eli-Meyer/ASV_utilities)
 <br>
 
 ##Pooled library concentration
+Pooled libraries will likely need to be concentrated to send out for sequencing. Sequencing facilities typically require ≤20 μl volume at ≥2 nM concentration.
+This can be done with a commercial PCR kit (e.g. Zymo DCC-5) following manufacturers protocol for cleaning PCR clean up.  
+Additionally, it can be done with ethanol precipitation.
+<br>
+
+###Isopropanol precipitation
+
+<br>
+1. Add 0.1 volumes of 3M sodium acetate and 3 volumes 100% isopropanol. 
+2. Incubate 30 minutes at --20°C.
+3. Centrifuge 20 minutes at maximum speed, 4°C.
+4. Dry pellet 15 min at room temperature and resuspend in 25 μl NFW.
 <br><br>
 
 #*ITS2* amplicon analyses
