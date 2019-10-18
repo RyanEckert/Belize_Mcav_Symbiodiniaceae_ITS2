@@ -16,7 +16,7 @@ output:
 <br>
 
 #About this document
-This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.** Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/stats).  
+This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.** Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/stats).  
 
 If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
   
@@ -24,9 +24,11 @@ The data used for this analysis are OTUs calculated with R packages *dada2* and 
 
 Additional data and walkthroughs:<br>
 
-*[Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2-ASV/lab_protocol)
-*[Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2-ASV/seq_processing)
-*[OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2-ASV/dada_lulu)
+*[Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
+<br>
+*[Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)
+<br>
+*[OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
 <br><br>
 
 #Basic setup of R environment and data
