@@ -41,7 +41,7 @@ Additionally, the DNA extraction and clean-up were used in **[Eckert, R. J., Stu
 
 #CTAB gDNA Extraction Protocol 
 ***
-Revised from [Mieog et al. (2009)](https://doi.org/10.1111/j.1755-0998.2008.02222.x) and http://ccb.ucr.edu/lab_protocols.html)
+Revised from [Mieog et al. (2009)](https://doi.org/10.1111/j.1755-0998.2008.02222.x) and http://ccb.ucr.edu/lab_protocols.html
 <br>
 
 ##Supplies
@@ -60,6 +60,7 @@ kable(supplies) %>%
 ##Reagent recipes
 Recipes for making ectraction buffer and associated stock solutions necessary for CTAB gDNA extraction follow.
 <br>
+
 ###2X CTAB extraction buffer
 Use heat and stirring to dissolve CTAB into solution before adding NaCl. Make CTAB buffer just prior to extractions. Can keep at room temperature for several days.
 ```{r, ctab buffer, fig.align = 'left'}
@@ -105,8 +106,7 @@ Set refridgerated centrifuge and set to 4 ºC
 
 #Cleaning genomic DNA
 ***
-After extracting genomic DNA, Zymo DNA Clean & Concentrator-5 (D4014) is used to clean DNA 
-and remove inhibitors prior to running a PCR.  
+After extracting genomic DNA, use Zymo DNA Clean & Concentrator-5 (D4014) to clean DNA and remove inhibitors prior to running a PCR. This greatly improves nanodrop 230/260 and 260/280 readings, dramatically increasing amplification success.  
 
 **Prior to first use add ethanol to Wash Buffer and label bottle.**  
 
@@ -150,7 +150,7 @@ kable(its2PCR, col.names = (c("","",""))) %>%
   row_spec(0, bold = FALSE) %>%
   add_header_above(c("PCR profile"=3), line = FALSE, font_size = "Large", align = 'left')
 ```
-<br><br><br><br><br> 
+<br><br><br><br><br><br> 
 
 1. Amplify samples with the *ITS2* forward and reverse primers (see ITS2-F-miseq and ITS2-R-miseq under [Primer sequence information](#primer-sequence-information)) using cycle checks to obtain a faint but distinct band (Should take ~22 cycles). Avoid over-amplification, don't run  more than 28 cycles. To add cycles, place samples back into thermocycler and run for the additional number of cycles (no initial heating or final exstension steps).
 2. Visualize on a gel using 3 µL of PCR product.  
@@ -159,6 +159,7 @@ kable(its2PCR, col.names = (c("","",""))) %>%
       c. If band is still not visible after checked on 3 gels, redo reaction using appropriate number of cycles.
 3. Run a final extenstion on all samples.
 3. Clean PCR product with geneJET PCR Purification Kit.  
+<br>
 
 ```{r, etbr gel}
 kable(etbrGel, col.names = (c("Reagent","For 300 mL gel"))) %>%
@@ -166,7 +167,7 @@ kable(etbrGel, col.names = (c("Reagent","For 300 mL gel"))) %>%
                   position = 'left') %>%
   column_spec(1, width = "12em") %>%
   column_spec(2, width = "8em") %>%
-  add_header_above(c("Sodium Borate/EtBr 1.5% Agarose gel Recipe"=2), line = FALSE, font_size = "Large", align = 'left') %>%
+  add_header_above(c("Sodium Borate/EtBr 1.5% Agarose gel Recipe"=2), line = FALSE, font_size = "Large") %>%
   add_footnote("Add EtBr just before pouring gel (60--55 ºC)", notation = "symbol")
 ```
 
@@ -225,7 +226,7 @@ kable(bcPCR, col.names = (c("","",""))) %>%
 4. You should see a single band approximately 500 bp.
 5. Excise DNA fragment from agarose gel with a clean, sharp scalpel. Avoid the edges of the band (i.e. take middle ~85 % of band). 
 6. removing as much of the agarose on the gel slice surrounding the band as possible. Place into a 1.5 mL tube.
-
+<br>
 ```{r, sybr gel}
 kable(sybrGel, col.names = (c("Reagent","For 300 mL gel"))) %>%
     kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
@@ -267,14 +268,14 @@ From [Eli Meyer](https://github.com/Eli-Meyer/ASV_utilities)
 5. Repeat steps 2-4 with a second plate containing the second half of the samples.
 6. To determine volumes of each library for the combined pool:
       a. Rank samples from lowest to highest CT and identify reference sample (sample with highest CT)
-      b. Calculate proportion of each library to sequence as:  
-                $PL = 2^{[CT(sample) – CT (reference)]}$
-      c. Calculate the volume of each library to use as:  
-                $V = PL * X µL$  
-            i. $X$ = vol of reference sample added to pool (somewhere around 20--25 µL for ITS2 libraries) 
-      d. Note: If you’ve chosen a reference sample with a very high CT (suggesting a failed library prep) relative to the others, very low volumes (<2 µL) may be calculated at this step. If so, choose the next sample (i.e. next lowest CT) as reference instead, and continue adjusting choice of reference until reasonably high volumes are calculated for the majority of samples.
-      e. Note: As a rough rule of thumb, the pool of combined samples used for a single lane of sequencing should be at least 200-500 µL at this stage (it may be substantially higher).
-7. Combine libraries using the volumes calculated from qPCR to produce a pool for sequencing.
+      b. Calculate proportion of each library to sequence as:
+      $$P_L = 2^{[CT_{(sample)} – CT_{(reference)}]}$$  
+      c. Calculate the volume of each library to use as:
+      $$V = P_L * X~µL$$
+          i. where $X$ = volume  of refernce sample to pool (20--30 µL)
+      d. Note: If you’ve chosen a reference sample with a very high CT (suggesting a failed library prep) relative to the others, very low volumes (<2 µL) may be calculated at this step. If so, choose the next sample (i.e. next lowest CT) as reference instead, and continue adjusting choice of reference until reasonably high volumes are calculated for the majority of samples. 
+      e. Note: As a rough rule of thumb, the pool of combined samples used for a single lane of sequencing should be at least 200-500 µL at this stage (it may be substantially higher). 
+7. Combine libraries using the volumes calculated from qPCR to produce a pool for sequencing. 
 <br>
 
 ##Pooled library concentration
@@ -283,9 +284,8 @@ This can be done with a commercial PCR kit (e.g. Zymo DCC-5) following manufactu
 Additionally, it can be done with ethanol precipitation.
 <br>
 
-###Isopropanol precipitation
+###Isopropanol precipitation 
 
-<br>
 1. Add 0.1 volumes of 3M sodium acetate and 3 volumes 100% isopropanol. 
 2. Incubate 30 minutes at --20°C.
 3. Centrifuge 20 minutes at maximum speed, 4°C.
@@ -315,6 +315,7 @@ kable(its2Primers, col.names = (c("Primer","Sequence: 5'-Universal adapter + ITS
 ```  
     
 Barcoded primers that also contain the Illumina adapter needed to bind to the flow cell of the MiSeq platform can then be added to the amplified products. Dual indexing (placing unique barcode sequences on both the forward and reverse primers is a cost-efficient way to include more samples while purchasing less barcode primers (i.e. 20 forward and 20 reverse barcode primers can label up to 400 unique samples). Primers used for this publication can be found on [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2).  
+
 ```{r, bc primer sequences}
 kable(bcPrimers, col.names = (c("Primer","Sequence: 5'-Illumina p5(or)p7 + Index + Universal adapter-3'"))) %>%
   kable_styling(bootstrap_options = c("condensed", "hover","striped"), full_width = FALSE, 
