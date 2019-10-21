@@ -16,19 +16,17 @@ output:
 <br>
 
 #About this document
-This is the code accompanies the publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef.** Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/stats).  
+This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x). Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/stats).  
 
-If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the included code in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to whereever the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
+If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
   
-The data used for this analysis are OTUs calculated with R packages *dada2* and *LULU*. The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number XXX <XXX>. Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
+The data used for this analysis are OTUs calculated with R packages *dada2* and *LULU*. The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [XXX](XXX). Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
 
-Additional data and walkthroughs:<br>
+####Additional protocols and walkthroughs:<br>
 
-*[Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
-<br>
-*[Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)
-<br>
-*[OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
+  * [Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)<br>
+  * [Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)<br>
+  * [OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
 <br><br>
 
 #Basic setup of R environment and data
@@ -37,19 +35,21 @@ Additional data and walkthroughs:<br>
 ##Loading required packages
 For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
 ```{r, setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(warning = FALSE, fig.align = 'left')
 ```
 
-```{r, load packages, include = TRUE, warning = TRUE}
+```{r, load packages, include = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("BiocManager", "car", "cluster", "dunn.test", "edgeR", "ggpubr", "labdsv", 
-               "MCMC.OTU", "multcompView", "pgirmess", "plyr", "reshape", "vegan")
+               "MCMC.OTU", "multcompView", "pgirmess", "plyr", "poppr", "reshape", "vegan")
 
 pacman::p_load_gh("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+
 
 if (!require("edgeR")){BiocManager::install("edgeR", update = FALSE) 
   library(edgeR)}
 ```
+<br>
 
 ##Creating a color palette to use for our data
 We need 10 colors, I'm using mostly ggPlot colors, but in a better order for visualizing our OTU bar chart. I like to set a default palette at the beginning and call specific colors from it as needed throughout.
@@ -66,19 +66,19 @@ pie(rep(1,length(its2ColPal)), col = its2ColPal)
 ##Loading our data into R
 First, we need to load in the data from dada2 and LULU analyses.
 ```{r, dada2 and LULU data, results='hide'}
-
 curated_result_97 = readRDS("curated_result_97.rds") #read in LULU output
-ITS2data <- read.csv("ASVtable.csv") #read in dada2 output
-head(ITS2data)
+its2dada <- read.csv("ASVtable.csv") #read in dada2 output
+head(its2dada)
 ```
 <br><br>
 
 #Preparing data for analyses
 Now that the data are loaded in, we can continue to make these data the way we need them for our analyses. We can combine our curated OTUs with the metadata we added to our ASV file.
 ```{r, combine OTU data and sample metadata}
-ITS2data = cbind(ITS2data[, 1:3], data.frame(t(curated_result_97$curated_table)))
+ITS2data = cbind(its2dada[, 1:3], data.frame(t(curated_result_97$curated_table)))
 ```
 And we can order sites from north to south so later data can be plotted shallow to deep; north to south. To do this we can set "Depth" and "Site" as factors 
+
 ```{r, order site and depth factors}
 ITS2data$Depth = factor(ITS2data$Depth, levels = c("10", "16", "25", "35"))
 levels(ITS2data$Site)
@@ -104,19 +104,16 @@ row.names(goods) = goods$sample
 
 ##Samples with data for OTUs
 What is the proportion of samples with data for these OTUs?
-```{r, proportion of good otus, tidy = TRUE}
-withData = apply(goods[, 5:length(goods[1, ])], 2, function(x) {
-  sum(x > 0) / length(x)
-})
-hist(withData, breaks = 50)
-
+```{r, proportion of good otus}
 props = apply(goods[, 5:length(goods[1, ])], 2, function(x) {
   sum(x) / sum(goods[, 5:length(goods[1, ])])
 })
 
 props
+props = as.data.frame(props)
 
-barplot(props, xaxt = "n", log = "y")
+barplot(props$props, log = "y", names.arg = rownames(props), 
+        xlab = "Sequence", ylab = "Proportion", col = its2ColPal)
 ```
 
 ##Normalizing reads across all samples
@@ -521,7 +518,7 @@ ggsave("its2_diversityPlots.eps", plot = divPlots, width = 8.25, height = 10,
        unit = "in", dpi = 600)
 ```
 
-```{r, resulting alpha plot figure panel, echo = FALSE, fig.width = 7.75, fig.height = 9.25, fig.align = 'center', results = 'hide'}
+```{r, resulting alpha plot figure panel, echo = FALSE, fig.width = 7.75, fig.height = 9.25, results = 'hide'}
 plot(divPlots)
 ```
 <br><br>
@@ -733,7 +730,7 @@ Nothing unusual here, neither the highest nor the lowest sequencing depth of all
 <br>
 
 ##nMDS without outlying samples
-Same idea as above, just with the new data lacking 10 C3g dominated samples. This way we can see if these samples are skewing our plot and obscuring a larger pattern in rest of the data.
+Plotting nMDS the same way as above, just with the new data lacking 10 C3g dominated samples. This way we can see if these samples are skewing our plot and obscuring a larger pattern in rest of the data.
 ```{r, nmds no outliers, results = 'hide', fig.show = 'hide'}
 set.seed(694)
 
@@ -797,15 +794,108 @@ its2NmdsPlot2 = its2NmdsPlotB +
 its2NmdsPlot2
 
 # saving new nMDS plot
-ggsave("nMDS_ASVs_noOut.eps", plot = its2NmdsPlot2, width = 9.2, height = 5.75, 
+ggsave("nMDS_OTU_noOut.eps", plot = its2NmdsPlot2, width = 9.2, height = 5.75, 
        dpi = 600, device = "eps")
 ```
 
-```{r, plot new nmds, echo = FALSE, fig.align = 'center', fig.width = 9.2, fig.height = 5.75}
+```{r, plot new nmds, echo = FALSE, fig.width = 9.2, fig.height = 5.75}
 plot(its2NmdsPlot2)
 ```
 Here we can see that there is not a larger pattern in the data that was being masked by the C3g dominant samples
-<br><br>
+<br>
+
+##nMDS with all original ASVs
+ASVs were clustered at 97% to produce OTUs for these analyses. While this is biologically relevant for Symbiodiniaceae, we can still look at the original ASVs to see if clustering masked any patterns in the data.<br>
+Prep the data
+```{r, asv data prep}
+its2Asv = its2dada
+its2AsvTransposed = t(its2Asv[, 4:length(its2Asv[1, ])])
+its2AsvList = DGEList(counts = its2AsvTransposed)
+head(its2AsvList$samples)
+```
+
+Normalization in *edgeR*
+```{r, asv normalization}
+its2AsvNorm =  calcNormFactors(its2AsvList, method = "TMM")
+head(its2AsvNorm$samples)
+its2AsvTMM = t(cpm(its2AsvNorm, normalized.lib.sizes = TRUE))
+its2AsvNorm = cbind(its2Asv[,c(1:3)], its2AsvTMM)
+```
+
+```{r, asv nmds, results = 'hide'}
+set.seed(694)
+its2AsvNmds = metaMDS(its2AsvNorm[4:ncol(its2AsvNorm)], try = 200)
+```
+
+```{r, asv nmds plot, fig.show = 'hide'}
+its2AsvNmds
+
+its2AsvScores = as.data.frame(scores(its2AsvNmds))
+its2AsvScores$site = factor(its2AsvNorm$Site)
+its2AsvScores$depth = as.factor(its2AsvNorm$Depth)
+its2AsvScores$sample = row.names(its2AsvScores)
+head(its2AsvScores)
+
+its2AsvClades = as.data.frame(scores(its2AsvNmds,"species"))
+its2AsvClades$seq = row.names(its2AsvClades)
+head(its2AsvClades)
+head(its2AsvClades$seq)
+
+its2AsvNmdsPlotA = ggplot() +
+  	            geom_point(data = its2AsvScores, aes(x = NMDS1, y = NMDS2,
+  	                       shape = depth, size = depth, fill = site),
+  	                       color = "black") + # add the site points
+                scale_fill_manual(values = its2ColPal[c(8,5,3,9)],
+                                  name = "Reef Site", labels = c("Tobacco Reef",
+                                  "Raph's Wall", "South Reef", "Glover's Reef")) +
+              	scale_shape_manual(values = c(24, 23, 22, 21), name = "Depth",
+              	                   labels = c("10 m", "16 m", "25 m", "35 m")) +
+              	scale_size_manual(values = c(3, 3.75, 3.75, 3.75)) +
+              	guides(shape = guide_legend( override.aes = list(size =
+              	       c(3, 3.75, 3.75, 3.75), fill = "white")), fill =
+              		     guide_legend(override.aes = list(shape = 22, size = 3.75,
+              		     color = NA)), size = FALSE)+
+              	#geom_text(data = its2AsvClades, aes(x = NMDS1, y = NMDS2,
+              	#                                 label = seq),
+              	#	        color = "#000000", size = 4, fontface = "italic") +
+                          # turning off seq labels, they completely obscure the plot
+              	annotate("label", x = 3.15, y = -2, label = paste
+              		        ("Distance = Bray-Curtis\nStress = ",
+              		        round(its2AsvNmds$stress, 4), sep = ""), size = 4) +
+                labs(x = "nMDS1", y = "nMDS2") +
+              	coord_equal() +
+              	theme_bw()
+
+its2AsvNmdsPlot = its2AsvNmdsPlotA +
+               theme(axis.title.x = element_text(color = "black", size = 12),
+              	     axis.text.x = element_blank(),
+              	     axis.ticks.x = element_blank(),
+              	     axis.title.y = element_text(color = "black", size = 12),
+              	     axis.text.y = element_blank(),
+              	     axis.ticks.y = element_blank(),
+              	     legend.position = "right",
+              	     legend.title = element_text(color = "black", size = 12),
+              	     legend.text = element_text(color = "black", size = 12),
+              	     legend.key = element_blank(),
+              	     legend.background = element_blank(),
+              	     panel.border = element_rect(color = "black", size = 1.2),
+              	     panel.background = element_rect(fill = "white"),
+              	     plot.background = element_blank()
+                     )
+
+its2AsvNmdsPlot
+```
+
+```{r, save asv nmds, results = 'hide'}
+ggsave("nMDS_ITS2_ASV.eps", plot = its2AsvNmdsPlot, width = 8, height = 5, dpi = 600,
+       device = "eps")
+```
+
+```{r, plot asv nmds, echo = FALSE, fig.width = 8, fig.height = 5}
+plot(its2AsvNmdsPlot)
+```
+Even with all unfiltered ASVs we still see the same clustering pattern among all samples.
+<br>
 
 #Relative abundance of Symbiodiniaceae OTUs
 Now we can calculate the relative abundance of each unique OTU per sample. This will allow us to view the community structure in a faceted barplot.
@@ -1034,7 +1124,7 @@ Now that we have our data setup correctly we can create the GLMM
 <br>
 
 ###Fitting the model
-Here we are using Depth as a fixed effect and running 10^6 iterations with a 5000 burn-in period.
+Here we are using Depth as a fixed effect and running 10^6^ iterations with a 5000 burn-in period.
 ```{r, mcmcglmm, results = 'hide', message = FALSE}
 set.seed(694)
 its2MmD = mcmc.otu(fixed = "Depth", data = glmStack,
@@ -1104,6 +1194,44 @@ its2glmPlotD
 ggsave("its2glmDepth.eps", plot=its2glmPlotD, width = 8, height = 6, dpi = 600)
 ```
 
-```{r, display glmm plot, echo = FALSE, fig.align = 'center', fig.width = 8, fig.height = 6, reults = 'hide'}
+```{r, display glmm plot, echo = FALSE, fig.width = 8, fig.height = 6, reults = 'hide'}
 plot(its2glmPlotD)
+```
+<br><br>
+
+#Phylogenetic tree of *M. cavernosa* samples
+Finally, to see if the 10 samples with unique Symbiodiniaceae communities are correlated with microsatellite genotypes we will plot a phylogenetic tree with *poppr*.
+<br>
+
+##Setup data for plotting
+```{r, poppr setup}
+set.seed(694)
+cbcGenotypes = read.csv("CBCgenotypes.csv")
+CBCgen = df2genind(cbcGenotypes[2:10], ind.names = cbcGenotypes$Sample, sep = ",")
+CBCgen
+
+CBCdist = provesti.dist(CBCgen)
+head(CBCdist)
+```
+<br>
+
+##Contsrtuct phylogenetic tree
+Based on genotypes from [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x). Starred samples in the data set contain the unique C3g dominant communities.
+```{r, plotting phylogenetic tree, fig.show = 'hide'}
+set.seed(694)
+MCAVtree = CBCdist %>%
+  nj() %>%    # calculate neighbor-joining tree
+  ladderize() # organize branches by clade
+
+mcavTree = plot(MCAVtree) %>% 
+  add.scale.bar(length = 0.05) # add a scale bar showing 5% difference.
+```
+##Save the tree
+```{r, save tree plot, results = 'hide'}
+ggsave("MCav_tree.eps", plot(MCAVtree) %>% add.scale.bar(length = 0.05), height = 30, units = "in", dpi = 600)
+```
+
+```{r, tree plot, fig.height = 35, echo = FALSE}
+plot(MCAVtree)%>%
+  add.scale.bar(length = 0.05)
 ```
