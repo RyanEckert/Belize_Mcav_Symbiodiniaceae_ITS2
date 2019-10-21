@@ -1,0 +1,345 @@
+################################################################################
+### Analyzing Symbiodiniaceae ITS2 reads on FAU KoKo HPC, version 11/17/18   ###
+### Written by Ryan Eckert (reckert2017@fau.edu)                             ###
+### adapted from pipelines developed by Eli Meyer and Carly Kenkel:          ###
+### (https://github.com/Eli-Meyer/ASV_utilities)                             ###
+### (http://doi.org/10.5281/zenodo.1208684)                                  ###
+###--------------------------------------------------------------------------###
+###                                                                          ###
+### This is my adaptation of analyzing ITS2 amplicon sequence variants       ###
+### This can definitely be done more elegantly, but this script works and    ###
+### can be adapted to work on any HPC.                                       ###
+###                                                                          ###
+### Be sure to download all associated scripts for this pipeline from GitHub ###
+### (github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/tree/master/scripts)     ###
+### and place them in a directory where they can be sourced (i.e. ~/bin/)    ###
+###                                                                          ###
+### BEFORE STARTING, replace, in this whole file:                            ###
+### - yourusername with your KoKo user name.                                 ###
+### - path/to/working/directory with the literal path to where you will      ###
+###   store your sequencing reads on KoKo                                    ###
+### The lines beginning with hash marks (#, excluding some of the scripts)   ###
+### are explanations and additional instructions, please make sure to read   ###
+### them before copy-pasting.                                                ###
+################################################################################
+
+## Move data to KoKo
+# on your local machine open terminal
+
+cd /path/to/directory #<- This is where your downloaded sequencing files are stored
+
+# Now we copy all gzipped files (*.gz) to the HPC
+scp *.gz yourusername@koko-login.fau.edu:~/path/to/working/directory
+
+#-------------------------------------------------------------------------------
+## Log onto KoKo and add modules to .bashrc
+ssh yourusername@koko-login.fau.edu
+# Enter your fau password
+
+# Add modules to .bashrc
+nano .bashrc
+
+# Append the following to .bashrc
+# These are what modules are named on KoKo, you might need to change yours, you
+# can check module named by returning: module avail
+module load python
+module load fastx_toolkit
+module load r-3.5.0-gcc-7.3.0-r6yikas #<- this is R v3.5 on KoKo
+module load launcher/3.0
+
+#-------------------------------------------------------------------------------
+## Clone scripts to KoKo and make executable
+cd
+mkdir bin
+cd bin
+
+
+git clone https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV.git
+mv Symbiodiniaceae-ITS2-ASV/scripts/* .
+rm -rf Symbiodiniaceae-ITS2-ASV
+chmod +x *.py *.pl *.R
+
+# add bin/ to you path so scripts can be accessed from anywhere on KoKo
+cd
+nano .bashrc
+#add this to your .bashrc file
+export PATH="$HOME/bin:$PATH";
+# Exit using Ctrl+X, save using ‘y’ and overwrite
+
+#-------------------------------------------------------------------------------
+# Open R and install required packages
+R
+
+# You are now using R within the terminal
+# Install the R packages, when asked to build personal directories return 'y'
+install.packages("vegan")
+install.packages("dplyr")
+install.packages("ggfortify")
+install.packages("MCMC.OTU")
+install.packages("labdsv")
+source("http://bioconductor.org/biocLite.R")
+BiocManager::install("devtools")
+library("devtools")
+devtools::install_github("benjjneb/dada2")
+devtools::install_github("tobiasgf/lulu")
+
+# To check if the installation worked, try loading the packages
+library(vegan)
+library(dada2)
+
+# You could run R from the command line in KOKO for these analyses, just like
+# using the R console, but for most of this, we will set up and run shell scripts
+# that launch R through SLURM
+# Quit R, return 'n' when asked to save workspace image.
+q()
+
+#-------------------------------------------------------------------------------
+## Set up a conda environment
+conda create -n ITS2
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+
+source activate ITS2
+
+# install FastQC (and MultiQC if needed)
+conda install fastqc
+
+# MultiQC should already be loaded in KoKo's base Anaconda, you can check by
+# returning the following in the command line: which multiqc
+# if you don't get a path to multiQC returned uncomment and run the code below
+# conda install multiqc
+
+
+#-------------------------------------------------------------------------------
+## Rename files with simple names
+# depending on where you sequenced your data you may need to edit the python
+# script (renameSeqData.py) to suit your specific file names
+
+cd /path/to/working/directory
+srun renameSeqData.py &
+
+#-------------------------------------------------------------------------------
+## Use FastQC and MultiQC to look at overall quality of reads
+
+cd /path/to/working/directory
+mkdir fastQC
+echo source activate ITS2 >fastqc.sh
+echo fastqc *.fastq >>fastqc.sh
+
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch fastqc.slurm
+
+mv *.html *.zip fastQC/
+cd fastQC
+
+echo multiqc . >multiqc.sh
+
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch multiqc.slurm
+
+# View multiqc output in a web browser to see overall quality
+# i.e. copy to local machine via scp
+
+logout
+cd path/to/directory/ #<- change this to where you want to store the multi qc file
+scp yourusername@koko-login.fau.edu:/path/to/working/directory/multiqc_report.html . #<- one period "." means "here" (i.e. present working directory)
+
+# log back in to koko
+ssh yourusername@koko-login.fau.edu
+# Enter your fau password
+
+#-------------------------------------------------------------------------------
+## Trim reads to remove low quality ends
+# View your multiQC file to determine where to trim reads based on overall quality
+# My reads seem to drop off below a phred score of 30 around 250 bp on forward
+# reads (R1) and 200 on reverse reads (R2).
+# I trimmed 50 bp from the 3' end of all R1 and 100 bp for the 3' end of all R2
+# reads. Where ever you trim, make sure to leave plenty of overlap (≥30 bp);
+# without primers Symbiodiniaceae ITS2 is ~ 300 bp.
+
+cd path/to/working/directory
+mkdir trimmedReads
+mkdir filteredReads
+mkdir targetReads
+mkdir cleanedReads
+
+# make a file for launcher_creator to run
+ls *R1* | perl -pe 's/(\S+).fastq/fastx_trimmer -Q33 -i $1.fastq -o $1.trim -t 50'/ >trim.sh
+ls *R2* | perl -pe 's/(\S+).fastq/fastx_trimmer -Q33 -i $1.fastq -o $1.trim -t 100'/ >>trim.sh
+
+launcher_creator.py -j trim.sh -n trim -q longq7 -N 5 -w 20 -t 10:00:00 -e yourusername@fau.edu
+sbatch trim.slurm
+
+mv *.trim ../trimmedReads
+cd ../trimmedReads
+mkdir fastQC
+
+echo source activate ITS2 >fastqc.sh
+echo fastqc *.trim >>fastqc.sh
+
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch fastqc.slurm
+
+mv *.html *.zip fastQC/
+cd fastQC
+
+echo multiqc . >multiqc.sh
+
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch multiqc.slurm
+
+# view resulting multiqc.html file in a web browser to verify quality is
+# improved after trimming reads. scp to local machine as previously
+
+#-------------------------------------------------------------------------------
+## Filter trimmed reads to remove any remaining low quality reads.
+# Here we are filtering out any reads with ≥ 10% bases with low phred scores (<20)
+# Since we trimmed R1 to 250 and R2 to 200 bp we set -x to 25 and 20, respectively.
+
+cd trimmedReads
+
+ls *R1.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 25 -o $1.filter/' >filter.sh
+ls *R2.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 20 -o $1.filter/' >>filter.sh
+
+launcher_creator.py -j filter.sh -n filter -q longq7 -N 4 -w 20 -t 10:00:00 -e yourusername@fau.edu
+sbatch filter.slurm
+
+# Move resulting files to filteredReads/
+mv *.filter ../filteredReads
+cd ../filteredReads
+
+# If wanted, we can see how this improved overall quality as before
+mkdir fastQC
+
+echo source activate ITS2 >fastqc.sh
+echo fastqc *.trim >>fastqc.sh
+
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch fastqc.slurm
+
+mv *.html *.zip fastQC/
+cd fastQC
+
+echo multiqc . >multiqc.sh
+
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch multiqc.slurm
+
+# view resulting multiqc.html file in a web browser to verify quality is
+# improved after trimming/filtering reads. scp to local machine as previously
+
+#-------------------------------------------------------------------------------
+## Remove any reads lacking expected primer sequences to ensure we are only
+# working on targeted reads in all downstream analyses.
+# If you used different primer sets you will have to change the F and R sequences
+# after the flag -s.
+
+cd path/to/working/directory/filteredReads
+
+ls *_R1.filter | perl -pe 's/(\S+).filter/ScreenFastqByPrimer.pl -i $1.filter -s GTGAATTGCAGAACTCCGTG -m 2/' >primers.sh
+ls *_R2.filter | perl -pe 's/(\S+).filter/ScreenFastqByPrimer.pl -i $1.filter -s CCTCCGCTTACTTATATGCTT -m 2/' >>primers.sh
+launcher_creator.py -j primers.sh -n primers -q longq7 -N 4 -w 20 -t 10:00:00 -e yourusername@fau.edu
+sbatch primers.slurm
+
+mv target.* ../targetReads
+mv nontarget.* ../targetReads
+
+cd ../targetReads
+mkdir nontarget
+mv nontarget.* nontarget
+
+#-------------------------------------------------------------------------------
+## Remove any orphaned reads (reads that lack both a F/R read pair)
+
+ls target.*_R1* | perl -pe 's/target.(\S+)_R1.filter/FindPairedReads.pl -f target.$1_R1.filter -r target.$1_R2.filter -g $1_R1.final.fastq -i $1_R2.final.fastq/' >orphans.sh
+
+launcher_creator.py -j orphans.sh -n orphans -q longq7 -N 4 -w 20 -t 10:00:00 -e yourusername@fau.edu
+sbatch orphans.slurm
+
+mv *.fastq ../cleanedReads
+
+cd ../cleanedReads
+finalRename.py #<- You may need to edit this script if you used a different naming convention
+
+#-------------------------------------------------------------------------------
+## Analyze cleaned reads for ASVs
+# edit dada2 R script to reflect your data, This R script has information about
+# which sections may need editing. This is an amalgamation of Meyer and Kenkel's
+# scripts.
+nano ~/bin/dada2.R
+
+# Exit using Ctrl+X, save using ‘y’ and overwrite
+
+echo R CMD BATCH ~/bin/dada2_script.R ASVs.log >dada2.sh
+
+launcher_creator.py -j dada2.sh -n dada2 -q longq7 -t 24:00:00 -e yourusername@fau.edu
+sbatch dada2.slurm
+
+#-------------------------------------------------------------------------------
+## Clean up directory and examine outfiles, to make sure everything worked
+
+mkdir qualPlots/
+mv QualPlot* qualPlots
+
+less ASVs.log
+# key 'q' to quit the less cmd after looking over log to make sure everything worked
+
+less ErrorEstimatesF.pdf
+less ErrorEstimatesR.pdf
+
+#-------------------------------------------------------------------------------
+## Blast resulting ASVs to identify clade types
+mkdir ../blast
+cp ASVs.fasta ASVtable.txt ../blast
+cd ../blast
+mv ~/bin/GeoSymbio_ITS2.fasta .
+awk '{sub(/;/," ;")}1' ASVs.fasta > ASVs_clean.fasta
+
+srun makeblastdb -in GeoSymbio_ITS2.fasta -dbtype nucl &
+
+srun BlastnID.pl -q ASVs_clean.fasta -d GeoSymbio_ITS2.fasta -s 200 -i ASVtable.txt -o annot.ASVtable.txt &
+
+#-------------------------------------------------------------------------------
+## Curate ASVs using LULU in R
+mkdir ../LULU/
+cp ASVs.fasta ASVtable.txt ../LULU/
+cd ../LULU
+
+# LULU doesn't deal well with the fasta output we have. Apparently the semi-colon
+# after each sequence name throws it off, so let's quickly fix it! Here we use
+# the awk command to find the string of text ';' and substitute ' ;' to add a space.
+# The output is then read out to a new file "ASVs_clean.fasta" and now that there's
+# a space between the sq# and the semi-colon, LULU will handle it much better.
+awk '{sub(/;/," ;")}1' ASVs.fasta > ASVs_clean.fasta
+
+# Make a blast database of your clean ASVs_clean
+srun makeblastdb -in ASVs_clean.fasta -parse_seqids -dbtype nucl &
+
+# Now blast your ASVs against themselves to produce matches
+srun blastn -db ASVs_clean.fasta -outfmt '6 qseqid sseqid pident' -out match_list.txt -qcov_hsp_perc 90 -perc_identity 97 -query ASVs_clean.fasta &
+
+# Make a script for launcher_creator
+echo R CMD BATCH ~/bin/lulu.R lulu.r.log >lulu.sh
+
+launcher_creator.py -j lulu.sh -n lulu -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+sbatch lulu.slurm
+
+# Look at the results to see how many ASVs we end up with after curation
+# Here we are left with 24 ASVs when clustering at 97%
+
+less curationResults.txt
+
+# We can also check the R log to make sure everything worked as expected
+# Everything looks good, hopefully yours does too!
+less lulu.r.log
+
+# At this point, I'm adding additional information in the DADA output for my samples.
+# After sample names, I'll add information about reef and sampling depth, so we can
+# use those to group samples for analyses. The way I do this is simply scp the output
+# file and edit with excel to add the columns and individual sample data. You might
+# be able to add it more eloquently, but I can't :)
+
+# from here on out, I'm exclusively working in R, using the script
+# "Symbiodiniaceae_ITS2_stats.R" also available from GitHub:
+# (github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/tree/master/scripts)
