@@ -1,7 +1,7 @@
 Symbiodiniaceae *ITS2* amplicon sequencing
 ==========================================
 
-### Ryan Eckert
+### Ryan Eckert -- <ryan.j.eckert@gmail.com>
 
 ### version: October 21, 2019
 
