@@ -18,7 +18,7 @@ output:
 #About this document
 This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x). Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/stats).  
 
-If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).  
+If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```). This was built with R vesion 'r getRversion'.  
   
 The data used for this analysis are OTUs calculated with R packages *dada2* and *LULU*. The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [XXX](XXX). Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
 
@@ -1226,6 +1226,8 @@ MCAVtree = CBCdist %>%
 mcavTree = plot(MCAVtree) %>% 
   add.scale.bar(length = 0.05) # add a scale bar showing 5% difference.
 ```
+<br>
+
 ##Save the tree
 ```{r, save tree plot, results = 'hide'}
 ggsave("MCav_tree.eps", plot(MCAVtree) %>% add.scale.bar(length = 0.05), height = 30, units = "in", dpi = 600)
