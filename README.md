@@ -22,9 +22,9 @@ Protocols and pipelines adapted from [Meiog et al.
 Bioperl scripts used for trimming and filtering written by [Eli
 Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
 
-#### Protocols and walkthroughs accompanying this manuscript:
-
 ------------------------------------------------------------------------
+
+#### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
     amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
