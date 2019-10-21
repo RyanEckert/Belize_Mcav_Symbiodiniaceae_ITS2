@@ -1,7 +1,7 @@
 ---
 title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
-date: "version: 10/17/2019"
+date: "version: October 21, 2019"
 output:
   html_document:
     theme: flatly
@@ -13,20 +13,23 @@ output:
     toc: yes
     toc_depth: '3'
 ---
+####[GitHub repository](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV.git){target="_blank"}
 <br>
 
 #About this document
-This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x). Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/tree/master/stats).  
 
-If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```). This was built with R version `r getRversion()`.  
+####All analyses preformed with R version `r getRversion()`.
+This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/tree/master/stats){target="_blank"}.  
+
+If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).   
   
 The data used for this analysis are OTUs calculated with R packages *dada2* and *LULU*. The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [XXX](XXX). Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
 
 ####Additional protocols and walkthroughs:<br>
 
-  * [Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)<br>
-  * [Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)<br>
-  * [OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
+  * [Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol){target="_blank"}<br>
+  * [Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing){target="_blank"}<br>
+  * [OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu){target="_blank"}
 <br><br>
 
 #Basic setup of R environment and data
@@ -1017,7 +1020,7 @@ set.seed(694)
 anova(betadisper(its2Dist, its2Norm$Depth))
 ```
 Dispersion is heteroschedastic, but PERMANOVA is robust to deviations in 
-homgeneity of variance ( Anderson and Walsh, 2013; <https://esajournals.onlinelibrary.wiley.com/doi/10.1890/12-2010.1>).
+homgeneity of variance ( Anderson and Walsh, 2013; <https://esajournals.onlinelibrary.wiley.com/doi/10.1890/12-2010.1>){target="_blank"}.
 <br>
 
 ##Running PERMANOVA in R
@@ -1216,7 +1219,7 @@ head(CBCdist)
 <br>
 
 ##Contsrtuct phylogenetic tree
-Based on genotypes from [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x). Starred samples in the data set contain the unique C3g dominant communities.
+Based on genotypes from [Eckert, R. J., Studivan, M. S., and Voss, J. D. (2019). Populations of the coral species *Montastraea cavernosa* on the Belize Barrier Reef lack vertical connectivity. Sci. Rep. 9, 7200.](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"}. Starred samples in the data set contain the unique C3g dominant communities.
 ```{r, plotting phylogenetic tree, fig.show = 'hide'}
 set.seed(694)
 MCAVtree = CBCdist %>%
@@ -1229,7 +1232,7 @@ mcavTree = plot(MCAVtree) %>%
 <br>
 
 ##Save the tree
-```{r, save tree plot, results = 'hide', message = 'hide'}
+```{r, save tree plot, results = 'hide', message = FALSE, warning = FALSE}
 ggsave("MCav_tree.eps", plot(MCAVtree) %>% add.scale.bar(length = 0.05), height = 30, units = "in", dpi = 600)
 ```
 
