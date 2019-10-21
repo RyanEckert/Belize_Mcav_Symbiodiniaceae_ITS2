@@ -27,7 +27,7 @@ Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
 ------------------------------------------------------------------------
 
 1.  [Protocol for DNA extraction and ITS2
-    amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)\
+    amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
 2.  [Post-processsing sequencing
     reads](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)
     {UNDER CONSTRUCTION}
