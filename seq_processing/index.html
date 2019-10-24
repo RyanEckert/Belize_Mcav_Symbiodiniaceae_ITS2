@@ -265,11 +265,11 @@ div.tocify {
 </div>
 
 
-<div id="version-october-22-2019" class="section level4">
-<h4>version: October 22, 2019</h4>
+<div id="version-october-24-2019" class="section level4">
+<h4>version: October 24, 2019</h4>
 </div>
 <div id="github-repository" class="section level4">
-<h4><a href="https://github.com/RyanEckert/Symbiodiniaceae-ITS2.git" target="_blank">GitHub repository</a></h4>
+<h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
 <hr />
 </div>
 <div id="this-page-is-presently-under-construction" class="section level1">
@@ -277,9 +277,11 @@ div.tocify {
 </div>
 <div id="about-this-document" class="section level1">
 <h1>About this document</h1>
-<p>adapted from pipelines developed by <a href="https://github.com/Eli-Meyer/ASV_utilities" target="_blank">Eli Meyer</a></p>
+<div id="adapted-from-pipelines-developed-by-eli-meyer" class="section level4">
+<h4>Adapted from pipelines developed by <a href="https://github.com/Eli-Meyer/ASV_utilities" target="_blank">Eli Meyer</a></h4>
 <p>This is my adaptation of analyzing ITS2 amplicon sequence variants. This can definitely be done more elegantly, but this script works onand can be adapted to work on any HPC.</p>
-<p>Be sure to download all associated scripts for this pipeline from GitHub (github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV/tree/master/scripts) and place them in a directory where they can be sourced (i.e. ~/bin/)</p>
+<p>Be sure to download all associated scripts for this pipeline from GitHub (github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2-ASV/tree/master/scripts) and place them in a directory where they can be sourced (i.e. ~/bin/)</p>
+</div>
 <div id="before-starting-replace-in-this-whole-file" class="section level4">
 <h4>BEFORE STARTING, replace, in this whole file:</h4>
 <ul>
@@ -293,9 +295,9 @@ div.tocify {
 <div id="additional-protocols-and-walkthroughs" class="section level4">
 <h4>Additional protocols and walkthroughs:<br></h4>
 <ul>
-<li><a href="https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol" target="_blank">Library preparation</a><br></li>
-<li><a href="https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu" target="_blank">OTU calculation</a></li>
-<li><a href="https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats" target="_blank">Statistical analyses of OTUs</a> <br><br></li>
+<li><a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol" target="_blank">Library preparation</a><br></li>
+<li><a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/dada_lulu" target="_blank">OTU calculation</a></li>
+<li><a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats" target="_blank">Statistical analyses of OTUs</a> <br><br></li>
 </ul>
 </div>
 </div>
@@ -332,9 +334,9 @@ module load launcher/3.0</code></pre>
 mkdir bin
 cd bin</code></pre>
 <p>Cloning scripts from GitHub repository and making executable</p>
-<pre class="bash"><code>git clone https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV.git
-mv Symbiodiniaceae-ITS2-ASV/scripts/* .
-rm -rf Symbiodiniaceae-ITS2-ASV
+<pre class="bash"><code>git clone https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2-ASV.git
+mv Belize_Mcav_Symbiodiniaceae_ITS2-ASV/scripts/* .
+rm -rf Belize_Mcav_Symbiodiniaceae_ITS2-ASV
 chmod +x *.py *.pl *.R</code></pre>
 <p>Add bin/ to you path so scripts can be accessed from anywhere on KoKo</p>
 <pre class="bash"><code>cd
@@ -506,7 +508,7 @@ cd ../cleanedReads</code></pre>
 <h1>Rename trimmed and filtered reads</h1>
 <hr />
 <pre class="bash"><code>finalRename.py #&lt;- You may need to edit this script if you used a different naming convention</code></pre>
-<p>Now all reads are trimmed and filtered. We can now use <em>dada2</em> and <em>LULU</em> to <a href="https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu" target="_blank">calculate OTUs</a> from the cleaned reads.</p>
+<p>Now all reads are trimmed and filtered. We can now use <em>dada2</em> and <em>LULU</em> to <a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/dada_lulu" target="_blank">calculate OTUs</a> from the cleaned reads.</p>
 </div>
 
 
