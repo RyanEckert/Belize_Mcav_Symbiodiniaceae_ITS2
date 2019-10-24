@@ -1,4 +1,4 @@
-Symbiodiniaceae *ITS2* amplicon sequencing
+Belize *Montastraea cavernosa* Symbiodiniaceae community *ITS2* amplicon sequencing
 ==========================================
 
 ### Ryan Eckert -- <ryan.j.eckert@gmail.com>
@@ -6,7 +6,6 @@ Symbiodiniaceae *ITS2* amplicon sequencing
 ### version: October 21, 2019
 
 ------------------------------------------------------------------------
-
 This repository contains scripts and data associated with the
 publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss
 JD.(in review) Symbiodiniaceae community variation among Montastraea
@@ -23,17 +22,19 @@ Bioperl scripts used for trimming and filtering written by [Eli
 Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
 
 ------------------------------------------------------------------------
-
 #### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
-    amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
+    amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol)
 2.  [Post-processsing sequencing
-    reads](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)
+    reads](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/seq_processing)
     {UNDER CONSTRUCTION}
 3.  [OTU
-    calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
+    calculation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/otu_calculation)
     {UNDER CONSTRUCTION}
 4.  [Statistical analysis of
-    OTUs](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats)
+    OTUs](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats)
+    
+------------------------------------------------------------------------
+#### Raw sequences can be found under NCBI SRA Project # [PRJNA579363](https://www.ncbi.nlm.nih.gov/bioproject/579363)
 
