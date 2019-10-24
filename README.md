@@ -1,4 +1,4 @@
-Symbiodiniaceae *ITS2* amplicon sequencing
+Belize *Montastraea cavernosa* Symbiodiniaceae community *ITS2* amplicon sequencing
 ==========================================
 
 ### Ryan Eckert -- <ryan.j.eckert@gmail.com>
@@ -27,13 +27,13 @@ Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
 #### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
-    amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
+    amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol)
 2.  [Post-processsing sequencing
-    reads](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing)
+    reads](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/seq_processing)
     {UNDER CONSTRUCTION}
 3.  [OTU
-    calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu)
+    calculation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/otu_calculation)
     {UNDER CONSTRUCTION}
 4.  [Statistical analysis of
-    OTUs](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats)
+    OTUs](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats)
 
