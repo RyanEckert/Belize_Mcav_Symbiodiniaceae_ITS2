@@ -6,7 +6,6 @@ Belize *Montastraea cavernosa* Symbiodiniaceae community *ITS2* amplicon sequenc
 ### version: October 21, 2019
 
 ------------------------------------------------------------------------
-
 This repository contains scripts and data associated with the
 publication **Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss
 JD.(in review) Symbiodiniaceae community variation among Montastraea
@@ -23,7 +22,6 @@ Bioperl scripts used for trimming and filtering written by [Eli
 Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
 
 ------------------------------------------------------------------------
-
 #### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
@@ -36,4 +34,7 @@ Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
     {UNDER CONSTRUCTION}
 4.  [Statistical analysis of
     OTUs](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats)
+    
+------------------------------------------------------------------------
+#### Raw sequences can be found under NCBI SRA Project # [PRJNA579363](https://www.ncbi.nlm.nih.gov/bioproject/579363)
 
