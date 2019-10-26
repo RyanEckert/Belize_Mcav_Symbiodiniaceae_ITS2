@@ -265,15 +265,12 @@ div.tocify {
 </div>
 
 
-<div id="version-october-24-2019" class="section level4">
-<h4>version: October 24, 2019</h4>
+<div id="version-october-25-2019" class="section level4">
+<h4>version: October 25, 2019</h4>
 </div>
 <div id="github-repository" class="section level4">
 <h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
 <hr />
-</div>
-<div id="this-page-is-presently-under-construction" class="section level1">
-<h1>THIS PAGE IS PRESENTLY UNDER CONSTRUCTION</h1>
 </div>
 <div id="about-this-document" class="section level1">
 <h1>About this document</h1>
@@ -287,7 +284,7 @@ div.tocify {
 <ul>
 <li>yourusername with your KoKo user name.<br />
 </li>
-<li>path/to/working/directory with the literal path to where you will store your sequencing reads on KoKo.<br />
+<li>path/to/directory with the literal path to where you will store your sequencing reads on KoKo.<br />
 </li>
 <li>The lines beginning with hash marks (#, excluding some of the shell scripts) are explanations and additional instructions, please make sure to read them before copy-pasting.</li>
 </ul>
@@ -319,24 +316,27 @@ scp *.gz yourusername@koko-login.fau.edu:~/path/to/working/directory</code></pre
 <p>Add modules to .bashrc</p>
 <pre class="bash"><code>cd 
 nano .bashrc</code></pre>
-<p>Append the following to .bashrc These are what modules are named on KoKo, you might need to change yours, youcan check</p>
-<pre class="bash"><code>module named by returning: module avail
-module load python
-module load fastx_toolkit
+<p>Append the following to .bashrc These are what modules are named on KoKo, you might need to change yours, you can check module named by returning: module avail</p>
+<pre class="bash"><code>module load fastx_toolkit
 module load r-3.5.0-gcc-7.3.0-r6yikas #&lt;- this is R v3.5 on KoKo
-module load launcher/3.0</code></pre>
+module load launcher/3.0
+
+# exit by pressing ctrl+x and return &quot;y&quot; to save
+
+source .bashrc #re-load your .bashrc file</code></pre>
 <p><br></p>
 </div>
 <div id="clone-scripts-to-koko" class="section level1">
 <h1>Clone scripts to KoKo</h1>
-<p>Making directory named “bin” if not already in place</p>
+<p>Making directory named “bin” if not already in place. SKIP this step if you already have a “bin/” directory</p>
 <pre class="bash"><code>cd
-mkdir bin
+mkdir bin #SKIP this step if you already have a &quot;bin/&quot;
+
 cd bin</code></pre>
 <p>Cloning scripts from GitHub repository and making executable</p>
-<pre class="bash"><code>git clone https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2-ASV.git
-mv Belize_Mcav_Symbiodiniaceae_ITS2-ASV/scripts/* .
-rm -rf Belize_Mcav_Symbiodiniaceae_ITS2-ASV
+<pre class="bash"><code>git clone https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git
+mv Belize_Mcav_Symbiodiniaceae_ITS2/scripts/* .
+rm -rf Belize_Mcav_Symbiodiniaceae_ITS2
 chmod +x *.py *.pl *.R</code></pre>
 <p>Add bin/ to you path so scripts can be accessed from anywhere on KoKo</p>
 <pre class="bash"><code>cd
@@ -349,49 +349,52 @@ export PATH=&quot;$HOME/bin:$PATH&quot;;
 </div>
 <div id="set-up-a-conda-environment" class="section level1">
 <h1>Set up a conda environment</h1>
-<pre class="bash"><code>conda create -n ITS2
+<pre class="bash"><code>module load anaconda
+
+conda create -n ITS2
 conda config --add channels defaults
 conda config --add channels bioconda
 conda config --add channels conda-forge
 
 source activate ITS2
 
-# install FastQC (and MultiQC if needed)
+# install FastQC and MultiQC
 conda install fastqc
+conda install multiqc
 
-# MultiQC should already be loaded in KoKo's base Anaconda, you can check by
-# returning the following in the command line: 
-which multiqc
-
-# if you don't get a path to multiQC returned uncomment and run the code below:
-# conda install multiqc</code></pre>
+module unload anaconda</code></pre>
 </div>
 <div id="rename-files-with-simple-names" class="section level1">
 <h1>Rename files with simple names</h1>
 <hr />
 <p>Depending on where you sequenced your data you may need to edit the python script (renameSeqData.py) to suit your specific file names</p>
 <pre class="bash"><code>cd /path/to/working/directory
-srun renameSeqData.py &amp; </code></pre>
+srun renameSeqData.py &amp;</code></pre>
+<p>Count raw reads per sample.</p>
+<pre class="bash"><code>cp ~/bin/countreads_raw.pl .
+srun gunzip *.gz
+
+perl countreads_raw.pl .fastq &gt;rawReadCount.txt
+srun gzip *.fastq</code></pre>
 <p><br></p>
 </div>
 <div id="looking-at-overall-read-quality" class="section level1">
 <h1>Looking at overall read quality</h1>
 <hr />
 <p>Use FastQC and MultiQC to look at overall quality of reads</p>
-<pre class="bash"><code>cd /path/to/working/directory
-mkdir fastQC
-echo source activate ITS2 &gt;fastqc.sh
-echo fastqc *.fastq &gt;&gt;fastqc.sh
+<pre class="bash"><code>mkdir fastQC
 
-launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
-sbatch fastqc.slurm
+ls *.gz | perl -pe 's/(\S+)/fastqc $1'/ &gt;fastqc.sh
 
-mv *.html *.zip fastQC/
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
+sbatch fastqc.slurm</code></pre>
+<p>Once the job finishes move the files and use multiqc</p>
+<pre class="bash"><code>mv *.html *.zip fastQC/
 cd fastQC
 
 echo multiqc . &gt;multiqc.sh
 
-launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
 sbatch multiqc.slurm</code></pre>
 <p>After the above job runs we can view multiqc output in a web browser to see overall quality. i.e. copy to local machine via scp</p>
 <pre class="bash"><code>logout
@@ -414,20 +417,20 @@ mkdir targetReads
 mkdir cleanedReads
 
 # make a file for launcher_creator to run
-ls *R1* | perl -pe 's/(\S+).fastq/fastx_trimmer -Q33 -i $1.fastq -o $1.trim -t 50'/ &gt;trim.sh
-ls *R2* | perl -pe 's/(\S+).fastq/fastx_trimmer -Q33 -i $1.fastq -o $1.trim -t 100'/ &gt;&gt;trim.sh
+ls *R1* | perl -pe 's/(\S+).fastq.gz/gunzip -c $1.fastq.gz | fastx_trimmer -Q33 -o $1.trim.gz -t 50 | xargs mv $1.trim -t trimmedReads'/ &gt;trim.sh
+ls *R2* | perl -pe 's/(\S+).fastq.gz/gunzip -c $1.fastq.gz | fastx_trimmer -Q33 -o $1.trim.gz -t 50 | xargs mv $1.trim -t trimmedReads'/ &gt;&gt;trim.sh
+# here we are listing all files that include &quot;R1&quot; and &quot;R2&quot; in them. We are then piping that into a perl script that creates a line for each file in a shell script. This script will unzip and trim each file, then move it into the trimmedReads/ directory.
+
 
 launcher_creator.py -j trim.sh -n trim -q longq7 -N 5 -w 20 -t 10:00:00 -e yourusername@fau.edu
 sbatch trim.slurm
 
-mv *.trim ../trimmedReads
-cd ../trimmedReads
+cd trimmedReads
 mkdir fastQC
 
-echo source activate ITS2 &gt;fastqc.sh
-echo fastqc *.trim &gt;&gt;fastqc.sh
+ls *.trim | perl -pe 's/(\S+)/fastqc $1'/ &gt;fastqc.sh
 
-launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
 sbatch fastqc.slurm
 
 mv *.html *.zip fastQC/
@@ -435,31 +438,37 @@ cd fastQC
 
 echo multiqc . &gt;multiqc.sh
 
-launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
 sbatch multiqc.slurm</code></pre>
-<p>View resulting multiqc.html file in a web browser to verify quality isimproved after trimming reads. scp to local machine as previously <br></p>
+<p>View resulting multiqc.html file in a web browser to verify quality is improved after trimming reads. scp to local machine as previously <br></p>
 </div>
 <div id="filter-remaining-low-quality-reads." class="section level1">
 <h1>Filter remaining low quality reads.</h1>
 <hr />
 <p>Here we are filtering out any reads with ≥ 10% bases with low phred scores (&lt;20). Since we trimmed R1 to 250 and R2 to 200 bp we set -x to 25 and 20, respectively.</p>
-<pre class="bash"><code>cd trimmedReads
+<pre class="bash"><code>#log back in to koko
+ssh yourusername@koko-login.fau.edu
+# Enter your fau password
 
-ls *R1.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 25 -o $1.filter/' &gt;filter.sh
-ls *R2.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 20 -o $1.filter/' &gt;&gt;filter.sh
+cd path/to/directory/trimmedReads
 
-launcher_creator.py -j filter.sh -n filter -q longq7 -N 4 -w 20 -t 10:00:00 -e yourusername@fau.edu
+ls *R1.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 25 -o $1.filter'/ &gt;filter.sh
+ls *R2.trim | perl -pe 's/(\S+).trim/QualFilterFastq.pl -i $1.trim -m 20 -x 20 -o $1.filter'/ &gt;&gt;filter.sh
+
+launcher_creator.py -j filter.sh -n filter -q longq7 -t 10:00:00 -e yourusername@fau.edu
 
 sbatch filter.slurm</code></pre>
 <p>Once job is finished, move resulting files to filteredReads/</p>
 <pre class="bash"><code>mv *.filter ../filteredReads
 cd ../filteredReads</code></pre>
 <p>If wanted, we can see how this improved overall quality as before</p>
-<pre class="bash"><code>mkdir fastQC
-echo source activate ITS2 &gt;fastqc.sh
-echo fastqc *.trim &gt;&gt;fastqc.sh
+<pre class="bash"><code>cd ../filteredReads
 
-launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+mkdir fastQC
+
+ls *.filter | perl -pe 's/(\S+)/fastqc $1'/ &gt;fastqc.sh
+
+launcher_creator.py -j fastqc.sh -n fastqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
 sbatch fastqc.slurm
 
 mv *.html *.zip fastQC/
@@ -467,7 +476,7 @@ cd fastQC
 
 echo multiqc . &gt;multiqc.sh
 
-launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -e yourusername@fau.edu
+launcher_creator.py -j multiqc.sh -n multiqc -q shortq7 -t 2:00:00 -m &quot;module load anaconda&quot; -b &quot;source activate ITS2&quot; -e yourusername@fau.edu
 sbatch multiqc.slurm</code></pre>
 <p>View resulting multiqc.html file in a web browser to verify quality is improved after trimming/filtering reads. <code>scp</code> to local machine as previously <br></p>
 </div>
@@ -496,7 +505,7 @@ mv nontarget.* nontarget</code></pre>
 <p>Now we will remove reads that lack both a F/R read pair</p>
 <pre class="bash"><code>ls target.*_R1* | perl -pe 's/target.(\S+)_R1.filter/FindPairedReads.pl -f target.$1_R1.filter -r target.$1_R2.filter -g $1_R1.final.fastq -i $1_R2.final.fastq/' &gt;orphans.sh
 
-launcher_creator.py -j orphans.sh -n orphans -q longq7 -N 4 -w 20 -t 10:00:00 -e yourusername@fau.edu
+launcher_creator.py -j orphans.sh -n orphans -q longq7 -t 10:00:00 -e yourusername@fau.edu
 sbatch orphans.slurm
 
 mv *.fastq ../cleanedReads
@@ -508,7 +517,10 @@ cd ../cleanedReads</code></pre>
 <h1>Rename trimmed and filtered reads</h1>
 <hr />
 <pre class="bash"><code>finalRename.py #&lt;- You may need to edit this script if you used a different naming convention</code></pre>
-<p>Now all reads are trimmed and filtered. We can now use <em>dada2</em> and <em>LULU</em> to <a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/dada_lulu" target="_blank">calculate OTUs</a> from the cleaned reads.</p>
+<p>Now all reads are trimmed and filtered. We can see how many reads remain in each sample.</p>
+<pre class="bash"><code>cp ~/bin/countreads_trim.pl .
+perl countreads_trim.pl fastq &gt;cleanReadCount.txt</code></pre>
+<p>We can now use <em>dada2</em> and <em>LULU</em> to <a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/dada_lulu" target="_blank">calculate OTUs</a> from the cleaned reads.</p>
 </div>
 
 
