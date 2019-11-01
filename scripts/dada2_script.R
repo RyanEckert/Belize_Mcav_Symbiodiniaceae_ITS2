@@ -15,7 +15,7 @@ fnFs
 fnRs
 
 #######	Visualize quality scores #######
-p<-1; q<-5		# generates quality plots for samples 1-4. modify to view others.
+p<-1; q<-4		# generates quality plots for samples 1-4. modify to view others.
 for (a in p:q)
 	{
 	pdf(paste("QualPlot",a,".pdf", sep=""))

@@ -325,7 +325,7 @@ less ErrorEstimatesF.pdf
 less ErrorEstimatesR.pdf</code></pre>
 </div>
 <div id="blast-resulting-asvs-to-identify-clade-types" class="section level1">
-<h1>Blast resulting ASVs to identify clade types</h1>
+<h1>BLAST resulting ASVs to identify clade types</h1>
 <pre class="bash"><code>mkdir ../blast
 cp ASVs.fasta ASVtable.txt ../blast
 cd ../blast
@@ -336,8 +336,8 @@ srun makeblastdb -in GeoSymbio_ITS2.fasta -dbtype nucl &amp;
 
 srun BlastnID.pl -q ASVs_clean.fasta -d GeoSymbio_ITS2.fasta -s 200 -i ASVtable.txt -o annot.ASVtable.txt &amp;</code></pre>
 </div>
-<div id="blast-asv-results" class="section level1">
-<h1>BLAST ASV results</h1>
+<div id="create-match-list-of-asvs" class="section level1">
+<h1>Create match list of ASVs</h1>
 <p>Make a blast database of your clean ASVs and blast your ASVs against themselves to produce matches.</p>
 <pre class="bash"><code>srun makeblastdb -in ASVs_clean.fasta -parse_seqids -dbtype nucl &amp;</code></pre>
 <pre class="bash"><code>srun blastn -db ASVs_clean.fasta -outfmt '6 qseqid sseqid pident' -out match_list.txt -qcov_hsp_perc 90 -perc_identity 97 -query ASVs_clean.fasta &amp;</code></pre>
