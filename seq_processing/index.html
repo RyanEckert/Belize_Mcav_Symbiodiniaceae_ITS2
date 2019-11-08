@@ -265,8 +265,8 @@ div.tocify {
 </div>
 
 
-<div id="version-october-25-2019" class="section level4">
-<h4>version: October 25, 2019</h4>
+<div id="version-november-08-2019" class="section level4">
+<h4>version: November 08, 2019</h4>
 </div>
 <div id="github-repository" class="section level4">
 <h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
@@ -320,6 +320,7 @@ nano .bashrc</code></pre>
 <pre class="bash"><code>module load fastx_toolkit
 module load r-3.5.0-gcc-7.3.0-r6yikas #&lt;- this is R v3.5 on KoKo
 module load launcher/3.0
+module load blast
 
 # exit by pressing ctrl+x and return &quot;y&quot; to save
 
@@ -330,7 +331,7 @@ source .bashrc #re-load your .bashrc file</code></pre>
 <h1>Clone scripts to KoKo</h1>
 <p>Making directory named “bin” if not already in place. SKIP this step if you already have a “bin/” directory</p>
 <pre class="bash"><code>cd
-mkdir bin #SKIP this step if you already have a &quot;bin/&quot;
+mkdir bin #SKIP this step if you already have a &quot;~/bin/&quot;
 
 cd bin</code></pre>
 <p>Cloning scripts from GitHub repository and making executable</p>
@@ -338,11 +339,11 @@ cd bin</code></pre>
 mv Belize_Mcav_Symbiodiniaceae_ITS2/scripts/* .
 rm -rf Belize_Mcav_Symbiodiniaceae_ITS2
 chmod +x *.py *.pl *.R</code></pre>
-<p>Add bin/ to you path so scripts can be accessed from anywhere on KoKo</p>
+<p>Add ~/bin/ to your path so scripts can be accessed from anywhere on KoKo</p>
 <pre class="bash"><code>cd
 nano .bashrc
 
-#add this to your .bashrc file
+#add this to your .bashrc file if not already there
 export PATH=&quot;$HOME/bin:$PATH&quot;;
 # Exit using Ctrl+X, save using ‘y’ and overwrite</code></pre>
 <p><br></p>
