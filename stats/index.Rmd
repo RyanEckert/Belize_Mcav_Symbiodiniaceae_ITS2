@@ -1,7 +1,6 @@
 ---
 title: "Symbiodiniaceae *ITS2* community analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
-date: "version: October 21, 2019"
 output:
   html_document:
     theme: flatly
@@ -13,13 +12,18 @@ output:
     toc: yes
     toc_depth: '3'
 ---
-####[GitHub repository](https://github.com/RyanEckert/Symbiodiniaceae-ITS2-ASV.git){target="_blank"}
-<br>
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, fig.align = 'left')
+library(magrittr)
+```
+####version: `r Sys.Date() %>% format(format="%B %d, %Y")`
 
+####[GitHub repository](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2-ASV.git){target="_blank"}
+***
 #About this document
-
+***
 ####All analyses preformed with R version `r getRversion()`.
-This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Symbiodiniaceae-ITS2/tree/master/stats){target="_blank"}.  
+This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
 
 If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).   
   
@@ -27,19 +31,16 @@ The data used for this analysis are OTUs calculated with R packages *dada2* and 
 
 ####Additional protocols and walkthroughs:<br>
 
-  * [Library preparation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol){target="_blank"}<br>
-  * [Sequence trimming and filetering](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/seq_processing){target="_blank"}<br>
-  * [OTU calculation](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/dada_lulu){target="_blank"}
+  * [Library preparation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol){target="_blank"}<br>
+  * [Sequence trimming and filetering](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/seq_processing){target="_blank"}<br>
+  * [OTU calculation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/dada_lulu){target="_blank"}
 <br><br>
 
 #Basic setup of R environment and data
-<br>
+***
 
 ##Loading required packages
 For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
-```{r, setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE, fig.align = 'left')
-```
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
 if (!require("pacman")) install.packages("pacman")
@@ -61,7 +62,7 @@ its2ColPal=c("#0081EF", "#00B0F6", "#00BFC4", "#39B600", "#9590FF", "#E76BF3", "
              "#F8766D", "#D89000", "#A3A500")
 ```
 
-```{r, palette, echo = FALSE, fig.align = 'center'}
+```{r, palette, echo = FALSE}
 #This is what the palette looks like in sequence
 pie(rep(1,length(its2ColPal)), col = its2ColPal)
 ```
@@ -70,15 +71,23 @@ pie(rep(1,length(its2ColPal)), col = its2ColPal)
 First, we need to load in the data from dada2 and LULU analyses.
 ```{r, dada2 and LULU data, results='hide'}
 curated_result_97 = readRDS("curated_result_97.rds") #read in LULU output
-its2dada <- read.csv("ASVtable.csv") #read in dada2 output
+its2meta = read.table("CBC_MCAV_sampling_metadata.txt", header = TRUE) #read in metadata
+head(its2meta)
+its2dada = t(read.table("ASVtable.txt"))
+its2dada = cbind(its2meta[1:3],its2dada, row.names = NULL)
+names(its2dada)[1:3]<-paste(c("Sample","Site","Depth"))
+
 head(its2dada)
 ```
 <br><br>
 
 #Preparing data for analyses
+***
 Now that the data are loaded in, we can continue to make these data the way we need them for our analyses. We can combine our curated OTUs with the metadata we added to our ASV file.
 ```{r, combine OTU data and sample metadata}
-ITS2data = cbind(its2dada[, 1:3], data.frame(t(curated_result_97$curated_table)))
+ITS2data = cbind(its2dada[, 1:3], data.frame(t(curated_result_97$curated_table)), row.names = NULL)
+
+head(ITS2data)
 ```
 And we can order sites from north to south so later data can be plotted shallow to deep; north to south. To do this we can set "Depth" and "Site" as factors 
 
@@ -90,7 +99,6 @@ ITS2data = ITS2data[order(ITS2data$Site, ITS2data$Depth), ]
 ITS2data$newOrder = 1:nrow(ITS2data)
 ITS2data = cbind(ITS2data[, length(ITS2data), drop = FALSE], 
                  ITS2data[, c(1:length(ITS2data) - 1)])
-row.names(ITS2data) = ITS2data$Sample
 head(ITS2data)
 ```
 Now we can call these data for the following analyses.
@@ -100,9 +108,8 @@ Now we can call these data for the following analyses.
 ```{r, purging outlying OTUs}
 goods = purgeOutliers(ITS2data, count.columns = 5:length(ITS2data), otu.cut = 0.001)
 goods$newOrder = 1:nrow(goods)
-row.names(goods) = goods$sample
+
 head(goods)
-row.names(goods) = goods$sample
 ```
 
 ##Samples with data for OTUs
@@ -120,7 +127,7 @@ barplot(props$props, log = "y", names.arg = rownames(props),
 ```
 
 ##Normalizing reads across all samples
-Here we normalize OTU counts with weighted trimmed mean of M-values (TMM; Robinson and Oshlack 2010; <https://doi.org/10.1186/gb-2010-11-3-r25>). This helps to account for disparity in sequencing depth across libraries.
+Here we normalize OTU counts with weighted trimmed mean of M-values (TMM; [Robinson and Oshlack 2010](https://doi.org/10.1186/gb-2010-11-3-r25){target="_blank"}). This helps to account for disparity in sequencing depth across libraries.
 First we transpose the data to work with *edgeR*
 ```{r, transpose data}
 itsGoodsTransposed = t(goods[, 5:length(goods[1, ])])
@@ -153,6 +160,7 @@ After all that everything looks good to go. On to the fun stuff!
 <br><br>
 
 #OTU $\alpha$-diversity
+***
 Looking at $\alpha$-diversity of Symbiodiniaceae OTU sequences in each of our samples for comparison. We will look at species richness, Shannon's index and Simpson's index
 <br>
 
@@ -527,6 +535,7 @@ plot(divPlots)
 <br><br>
 
 #Ordination with PCoA
+***
 We can use principal coordinates analysis (PCoA) to visualize our samples based on significant OTUs.
 But, first we need to set up data for PCoA analysis in R.
 <br>
@@ -617,12 +626,13 @@ ggsave("ITS2_OTU_PCoA.eps", plot = its2Pcoa, width = 10, height = 6.25, dpi = 60
        device="eps")
 ```
 
-```{r, pcoa plot, echo = FALSE, fig.width = 8, fig.height = 5, fig.align = 'center'}
+```{r, pcoa plot, echo = FALSE, fig.width = 8, fig.height = 5}
 plot(its2Pcoa)
 ```
 <br><br>
 
 #Ordination with nMDS
+***
 Now we can view the data with nMDS using the package *vegan* again.
 First we have to run the calculations for the nMDS. 
 This is similar to PCoA, but can be scaled freely and uses an iterative process.
@@ -703,7 +713,7 @@ ggsave("nMDS_ITS2_OTU.eps", plot = its2NmdsPlot, width = 8, height = 5, dpi = 60
        device = "eps")
 ```
 
-```{r, nmds plot, echo = FALSE, fig.width = 8, fig.height = 5, fig.align = 'center'}
+```{r, nmds plot, echo = FALSE, fig.width = 8, fig.height = 5}
 plot(its2NmdsPlot)
 ```
 <br>
@@ -823,6 +833,11 @@ its2AsvNorm =  calcNormFactors(its2AsvList, method = "TMM")
 head(its2AsvNorm$samples)
 its2AsvTMM = t(cpm(its2AsvNorm, normalized.lib.sizes = TRUE))
 its2AsvNorm = cbind(its2Asv[,c(1:3)], its2AsvTMM)
+
+its2AsvNorm$Depth = factor(its2AsvNorm$Depth, levels = c("10", "16", "25", "35"))
+levels(its2AsvNorm$Depth)
+its2AsvNorm$Site = factor(its2AsvNorm$Site, levels(its2AsvNorm$Site)[c(4, 2, 3, 1)])
+levels(its2AsvNorm$Site)
 ```
 
 ```{r, asv nmds, results = 'hide'}
@@ -901,6 +916,7 @@ Even with all unfiltered ASVs we still see the same clustering pattern among all
 <br>
 
 #Relative abundance of Symbiodiniaceae OTUs
+***
 Now we can calculate the relative abundance of each unique OTU per sample. This will allow us to view the community structure in a faceted barplot.
 <br>
 
@@ -1003,12 +1019,13 @@ ggsave("OTUbarPlot2.eps", plot = OTUplot, width = 8, height = 6, unit = "in",
        dpi = 600)
 ```
 
-```{r, otuplot, echo = FALSE, fig.width = 8, fig.height = 6, fig.align = 'center'}
+```{r, otuplot, echo = FALSE, fig.width = 8, fig.height = 6}
 plot(OTUplot)
 ```
 <br><br>
 
 #*ITS2* community differences
+***
 Now we can use permutational multivariate analysis of variance (PERMANOVA) to  test for differences in 
 Symbiodiniaceae $\beta$-diversity across Site and Depth based on our OTUs.
 <br>
@@ -1100,6 +1117,7 @@ The differences are still between 25 m and the shallower sites (10 + 16 m). This
 <br><br>
 
 #Generalized linear mixed model of OTUs
+***
 To see how significantly changing OTUs across depth we will use the package *MCMC.OTU*, which performs Bayesian analysis of multivariate count data.
 This will create a MCMC-based GLMM analysis of our OTU data.
 <br>
@@ -1127,7 +1145,7 @@ Now that we have our data setup correctly we can create the GLMM
 <br>
 
 ###Fitting the model
-Here we are using Depth as a fixed effect and running 10^6^ iterations with a 5000 burn-in period.
+Here we are using Depth as a fixed effect and running 10^5^ iterations with a 5000 rep burn-in period.
 ```{r, mcmcglmm, results = 'hide', message = FALSE}
 set.seed(694)
 its2MmD = mcmc.otu(fixed = "Depth", data = glmStack,
@@ -1203,6 +1221,7 @@ plot(its2glmPlotD)
 <br><br>
 
 #Phylogenetic tree of *M. cavernosa* samples
+***
 Finally, to see if the 10 samples with unique Symbiodiniaceae communities are correlated with microsatellite genotypes we will plot a phylogenetic tree with *poppr*.
 <br>
 
@@ -1219,7 +1238,7 @@ head(CBCdist)
 <br>
 
 ##Contsrtuct phylogenetic tree
-Based on genotypes from [Eckert, R. J., Studivan, M. S., and Voss, J. D. (2019). Populations of the coral species *Montastraea cavernosa* on the Belize Barrier Reef lack vertical connectivity. Sci. Rep. 9, 7200.](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"}. Starred samples in the data set contain the unique C3g dominant communities.
+Based on genotypes from [Eckert, R. J., Studivan, M. S., and Voss, J. D. (2019). Populations of the coral species *Montastraea cavernosa* on the Belize Barrier Reef lack vertical connectivity. Sci. Rep. 9, 7200.](https://doi.org/10.1038/s41598-019-43479-x){target="_blank"} Starred samples in the data set contain the unique C3g dominant communities.
 ```{r, plotting phylogenetic tree, fig.show = 'hide'}
 set.seed(694)
 MCAVtree = CBCdist %>%

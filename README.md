@@ -28,10 +28,8 @@ Meyer](https://github.com/Eli-Meyer/ASV_utilities) <br><br>
     amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol)
 2.  [Post-processsing sequencing
     reads](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/seq_processing)
-    {UNDER CONSTRUCTION}
 3.  [OTU
     calculation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/otu_calculation)
-    {UNDER CONSTRUCTION}
 4.  [Statistical analysis of
     OTUs](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats)
     

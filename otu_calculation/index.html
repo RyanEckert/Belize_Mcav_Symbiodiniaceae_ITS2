@@ -265,8 +265,8 @@ div.tocify {
 </div>
 
 
-<div id="version-november-01-2019" class="section level4">
-<h4>version: November 01, 2019</h4>
+<div id="version-november-08-2019" class="section level4">
+<h4>version: November 08, 2019</h4>
 </div>
 <div id="github-repository" class="section level4">
 <h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
@@ -283,7 +283,7 @@ div.tocify {
 <h4>BEFORE STARTING, replace, in this whole file:</h4>
 <ul>
 <li>yourusername with your KoKo user name.</li>
-<li>path/to/directory with the literal path to where you will store your sequencing reads on KoKo.</li>
+<li>path/to/directory with the literal path to where you will store your sequencing reads on KoKo or local machine.</li>
 <li>The lines beginning with hash marks (#) are explanations and additional instructions, please make sure to read them before copy-pasting.</li>
 </ul>
 </div>
@@ -302,11 +302,43 @@ div.tocify {
 # Enter your fau password</code></pre>
 <p><br></p>
 </div>
+<div id="set-up-modules-in-.bashrc" class="section level1">
+<h1>Set up modules in .bashrc</h1>
+<p>If you don’t already have modules loaded for launcherCreator, R, and BLAST, add them to your .bash rc so they will load when you log in to KoKo</p>
+<pre class="bash"><code>module load r-3.5.0-gcc-7.3.0-r6yikas #&lt;- this is R v3.5 on KoKo
+module load launcher/3.0
+module load blast
+
+# exit by pressing ctrl+x and return &quot;y&quot; to save
+
+source .bashrc #re-load your .bashrc file</code></pre>
+</div>
+<div id="download-necessary-scripts-to-bin-directory" class="section level1">
+<h1>Download necessary scripts to ~/bin directory</h1>
+<p>If you have not already, download scripts from GitHub and make them accessible on KoKo by placing into a folder that is in your PATH</p>
+<pre class="bash"><code>cd
+mkdir bin #SKIP this step if you already have a &quot;bin/&quot;
+
+cd bin</code></pre>
+<p>Cloning scripts from GitHub repository and making executable</p>
+<pre class="bash"><code>git clone https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git
+mv Belize_Mcav_Symbiodiniaceae_ITS2/scripts/* .
+rm -rf Belize_Mcav_Symbiodiniaceae_ITS2
+chmod +x *.py *.pl *.R</code></pre>
+<p>Add bin/ to your PATH so scripts can be accessed from anywhere on KoKo</p>
+<pre class="bash"><code>cd
+nano .bashrc
+
+#add this to your .bashrc file
+export PATH=&quot;$HOME/bin:$PATH&quot;;
+# Exit using Ctrl+X, save using ‘y’ and overwrite</code></pre>
+<p><br></p>
+</div>
 <div id="analyze-cleaned-reads-for-asvs" class="section level1">
 <h1>Analyze cleaned reads for ASVs</h1>
-<p>This dada2 R script has information about which sections may need editing. This is an amalgamation of Meyer and Kenkel’s scripts with additional edits. It’s set up to run on a HPCC (i.e. FAU’s KoKo) but you could also open it in R and run it line by line if you wanted to. However, it will run faster on KoKo and is fairly plug and play.<br> First open the script and edit as needed.</p>
+<p>This dada2 R script has information about which sections may need editing. This is an amalgamation of Meyer and Kenkel’s scripts with additional edits. It’s set up to run on a HPCC (i.e. FAU’s KoKo), but you could also open it in R and run it line by line if you wanted to. However, it will run faster on KoKo and is fairly plug and play.<br> First open the script and edit as needed.</p>
 <pre class="bash"><code>cd path/to/directory/cleanedReads
-nano ~/bin/dada2.R
+nano ~/bin/dada2_script.R
 
 # Exit using Ctrl+X, save using ‘y’ and overwrite
 
@@ -319,10 +351,7 @@ sbatch dada2.slurm</code></pre>
 mv QualPlot* qualPlots
 
 less ASVs.log
-# key 'q' to quit the less cmd after looking over log to make sure everything worked
-
-less ErrorEstimatesF.pdf
-less ErrorEstimatesR.pdf</code></pre>
+# key 'q' to quit the less cmd after looking over log to make sure everything worked</code></pre>
 </div>
 <div id="blast-resulting-asvs-to-identify-clade-types" class="section level1">
 <h1>BLAST resulting ASVs to identify clade types</h1>
@@ -339,13 +368,15 @@ srun BlastnID.pl -q ASVs_clean.fasta -d GeoSymbio_ITS2.fasta -s 200 -i ASVtable.
 <div id="create-match-list-of-asvs" class="section level1">
 <h1>Create match list of ASVs</h1>
 <p>Make a blast database of your clean ASVs and blast your ASVs against themselves to produce matches.</p>
-<pre class="bash"><code>srun makeblastdb -in ASVs_clean.fasta -parse_seqids -dbtype nucl &amp;</code></pre>
-<pre class="bash"><code>srun blastn -db ASVs_clean.fasta -outfmt '6 qseqid sseqid pident' -out match_list.txt -qcov_hsp_perc 90 -perc_identity 97 -query ASVs_clean.fasta &amp;</code></pre>
+<pre class="bash"><code>srun makeblastdb -in ASVs_clean.fasta -parse_seqids -dbtype nucl &amp;
+
+srun blastn -db ASVs_clean.fasta -outfmt '6 qseqid sseqid pident' -out match_list.txt -qcov_hsp_perc 90 -perc_identity 97 -query ASVs_clean.fasta &amp;</code></pre>
 </div>
 <div id="curate-asvs-using-lulu-in-r" class="section level1">
 <h1>Curate ASVs using LULU in R</h1>
 <pre class="bash"><code>mkdir ../LULU/
 cp ASVs.fasta ASVtable.txt ../LULU/
+cp match_list.txt ../LULU/
 cd ../LULU</code></pre>
 <p>LULU doesn’t deal well with the fasta output we have. Apparently the semi-colon after each sequence name throws it off, so let’s quickly fix it! Here we use the <code>awk</code> command to find the string of text ‘;’ and substitute ‘;’ to add a space. The output is then read out to a new file “ASVs_clean.fasta” and now that there’s a space between the sq# and the semi-colon, LULU will handle it much better.</p>
 <pre class="bash"><code>awk '{sub(/;/,&quot; ;&quot;)}1' ASVs.fasta &gt; ASVs_clean.fasta</code></pre>
@@ -359,8 +390,19 @@ sbatch lulu.slurm</code></pre>
 <p>Here we are left with 24 ASVs when clustering at 97%</p>
 <p>We can also check the R log to make sure everything worked as expected</p>
 <pre class="bash"><code>less lulu.r.log</code></pre>
-<p>Everything looks good, hopefully yours does too!</p>
-<p>At this point, I’m adding additional information in the DADA output for my samples. After sample names, I’ll add information about reef and sampling depth, so we can use those to group samples for analyses. The way I do this is simply scp the output file and edit with excel to add the columns and individual sample data. You might be able to add it more eloquently, but I can’t :)</p>
+<p>Everything looks good, hopefully yours does too! <br></p>
+</div>
+<div id="copy-files-from-hpc-to-local-machine" class="section level1">
+<h1>Copy files from HPC to local machine</h1>
+<p>At this point, we are done using KoKo and will finish further analyses exclusively on our local machine in R</p>
+<pre class="bash"><code>logout
+cd path/to/directory #This is the directory you will use for statistical analysis of reads
+
+scp yourusername@koko-login.fau.edu:/home/yourusername/path/to/directory/cleanedReads/ASVtable.txt .
+# Enter your fau password
+
+scp yourusername@koko-login.fau.edu:/home/yourusername/path/to/directory/LULU/curated_result_97.rds .
+</code></pre>
 <p>Finally, we can analyze these OTUs following the <a href="https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats" target="_blank">Statistical analyses of OTUs</a> walkthrough.</p>
 </div>
 
