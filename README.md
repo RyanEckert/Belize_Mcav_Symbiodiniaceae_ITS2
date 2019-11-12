@@ -3,7 +3,7 @@ Belize *Montastraea cavernosa* Symbiodiniaceae community *ITS2* amplicon sequenc
 
 ### Ryan Eckert -- <ryan.j.eckert@gmail.com>
 
-### version: October 24, 2019
+### version: November 12, 2019
 
 ------------------------------------------------------------------------
 This repository contains scripts and data associated with the
