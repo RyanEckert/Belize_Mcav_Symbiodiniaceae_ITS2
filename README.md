@@ -1,5 +1,9 @@
-\#Symbiodiniaceae *ITS2* amplicon sequencing \#\#\#Ryan Eckert --
-<ryan.j.eckert@gmail.com> \#\#\#version: February 13, 2020
+Symbiodiniaceae *ITS2* amplicon sequencing
+==========================================
+
+### Ryan Eckert -- <ryan.j.eckert@gmail.com>
+
+### version: February 13, 2020
 
 ------------------------------------------------------------------------
 
@@ -11,14 +15,14 @@ Reef.**
 
 Protocols adapted from [Meiog et
 al. 2009](https://doi.org/10.1111/j.1755-0998.2008.02222.x); [Klepac et
-al. 2013](https://doi.org/10.3354/meps11369).\
+al. 2013](https://doi.org/10.3354/meps11369).\
 <br><br>
 
 ------------------------------------------------------------------------
 
-\#\#\#\#Protocols and walkthroughs accompanying this manuscript:
+#### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
-    amplification](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/lab_protocol)
+    amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol/)
 2.  [Statistical analysis of sequencing
-    reads](https://ryaneckert.github.io/Symbiodiniaceae-ITS2/stats)
+    reads](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats/)

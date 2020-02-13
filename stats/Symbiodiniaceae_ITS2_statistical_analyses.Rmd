@@ -1,0 +1,470 @@
+---
+title: "Symbiodiniaceae *ITS2* analyses"
+author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  html_document:
+    theme: flatly
+    code_folding: show
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, fig.align = 'left')
+library(magrittr)
+```
+#### version: `r Sys.Date() %>% format(format="%B %d, %Y")`
+
+#### [GitHub repository](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git){target="_blank"}
+***
+# About this document
+***
+#### All analyses preformed with R version `r getRversion()`.
+This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [github](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
+
+If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).   
+  
+The data used for this analysis are calculated with *SymPortal* . The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [PRJNA579363](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA579363){target="_blank"}. Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
+
+#### Additional protocols:<br>
+
+  * [Library preparation](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol){target="_blank"}<br>
+
+# Basic setup of R environment
+***
+
+## Loading required packages
+For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
+
+```{r, load packages, include = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
+setwd("~/Documents/HBOI/Carrie_Bow/Data/Zoox/SymPortal/data_analysis")
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("ggplot2", "dplyr", "reshape2", "MCMC.OTU", "vegan", "edgeR", 
+               "pairwiseAdonis", "RColorBrewer", "Redmonder")
+
+pacman::p_load_gh("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+
+
+if (!require("edgeR")){BiocManager::install("edgeR", update = FALSE) 
+  library(edgeR)}
+
+options("scipen" = 10)
+```
+<br>
+
+# *ITS2* sequences
+***
+## Loading *ITS2* sequence data into R
+First, we need to load in the data from *SymPortal* analysis and clean it up in R.
+We can order sites from north to south so later data can be plotted shallow to deep; north to south. To do this we can set "Depth_zone" and "Sample_site" as factors and define the order of the factors.
+```{r, SymPortal sequence data, results='hide'}
+its2Seq = read.delim("62_20190310_DBV_2019-03-11_01-11-25.167036.seqs.absolute.clean.txt", header = TRUE, check.names = FALSE)
+head(its2Seq)
+
+its2Seq$Depth_zone = factor(its2Seq$Depth_zone, levels = c("10", "16", "25", "35"))
+levels(its2Seq$Depth_zone)
+
+its2Seq$Sample_site = factor(its2Seq$Sample_site, levels(its2Seq$Sample_site)[c(4, 2, 3, 1)])
+its2Seq = its2Seq[order(its2Seq$Sample_site, its2Seq$Depth_zone), ]
+levels(its2Seq$Sample_site)
+
+head(its2Seq)
+```
+<br><br>
+
+## Purging outlier sequences and normalizing reads
+Here we remove low abundance (< 0.01%) sequences and normalize sequence counts with weighted trimmed mean of M-values (TMM; [Robinson and Oshlack 2010](https://doi.org/10.1186/gb-2010-11-3-r25){target="_blank"}). This helps to account for disparity in sequencing depth across libraries.<br>
+
+First we purge sequences and transpose the data to work with *edgeR*
+```{r, purging outlying sequences and normalizing reads}
+goods = purgeOutliers(its2Seq, count.columns = 4:length(its2Seq), otu.cut = 0.0001, sampleZcut = -5)
+```
+```{r, seq norm, results = 'hide'}
+its2SeqTransposed = t(goods[, 4:length(goods[1, ])])
+its2SeqList = DGEList(counts = its2SeqTransposed)
+head(its2SeqList$samples)
+```
+
+Now we can use TMM normalization in *edgeR*
+```{r, seq norm 2, results = 'hide'}
+its2SeqNorm =  calcNormFactors(its2SeqList, method = "TMM")
+head(its2SeqNorm$samples)
+its2TMM = t(cpm(its2SeqNorm, normalized.lib.sizes = TRUE))
+its2SeqNorm = cbind(its2Seq[,c(1:3)], its2TMM)
+colnames(its2SeqNorm)[4] = "Clade C"
+```
+```{r, seq norm 3}
+head(its2SeqNorm)
+```
+
+## Calculation of *ITS2* sequence relative abundances
+Now we can calculate the relative abundance of each *ITS2* sequences per sample. This will allow us to view the assemblages in a faceted barplot.
+
+```{r, prepare sequences for plotting}
+colOrder = order(colSums(its2SeqNorm[4:length(its2SeqNorm[1,])]), decreasing = FALSE) + 3
+
+its2SeqPerc = cbind(its2SeqNorm[,c(1:3)], its2SeqNorm[,c(colOrder)])
+
+its2SeqPerc$sum = apply(its2SeqPerc[, c(4:length(its2SeqPerc[1,]))], 1, function(x) {
+  sum(x, na.rm = T)
+})
+
+its2SeqPerc = cbind(its2SeqPerc[, c(1:3)], (its2SeqPerc[, c(4:(ncol(its2SeqPerc)-1))] 
+                                                / its2SeqPerc$sum))
+```
+<br>
+Now a quick sanity check. If this worked the sum of each row should = 100% (i.e. "1").
+```{r, sanity check}
+apply(its2SeqPerc[, c(4:(ncol(its2SeqPerc)))], 1, function(x) {
+  sum(x, na.rm = T)
+})
+```
+Everything adds up to 1, this is good! The code works.
+<br>
+
+I added an additional column to sort better for the stacked barplot. This was just a work around to get the ```facet_grid()``` function to play nice with our data. I added a coulumn "barPlotOrder" and for each population I filled in a series 1:n foreach sample at each Site:Depth combo, so now there's no large blank expanses on the plot.
+```{r, prepare sequences for plotting 2, results = 'hide'}
+sampleCounts = plyr::count(its2SeqPerc, c('Sample_site','Depth_zone'))
+meltedList = melt(lapply(sampleCounts$freq,function(x){c(1:x)}))
+its2SeqPerc$barPlotOrder = meltedList$value
+its2SeqPerc=its2SeqPerc[c(1,ncol(its2SeqPerc),2:(ncol(its2SeqPerc)-1))]
+
+head(its2SeqPerc)
+
+gssSeq = otuStack(its2SeqPerc, count.columns = c(5:length(its2SeqPerc[1, ])),
+                  condition.columns = c(1:4))[1:19521,] # remove summ rows
+
+levels(gssSeq$otu)
+
+levels(gssSeq$Depth_zone)
+levels(gssSeq$Depth_zone) = c("10 m", "16 m", "25 m", "35 m")
+levels(gssSeq$Sample_site)
+levels(gssSeq$Sample_site) = c("Tobacco Reef", "Raph's Wall", "South Reef", "Glover's Reef")
+levels(gssSeq$Depth_zone)
+levels(gssSeq$Sample_site)
+```
+<br><br>
+
+## Consruct *ITS2* sequence barplot
+```{r, ITS2 sequence barplot, fig.show = 'hide'}
+colorCount = length(c(5:length(its2SeqPerc[1,])))
+getPalette = colorRampPalette(redmonder.pal(8, "qPBI"), bias = 1.7)
+
+its2SeqPlotA = ggplot(gssSeq, aes(x = barPlotOrder, y = count, fill = factor(otu))) +
+  geom_bar(position = "stack", stat = "identity", color = "black",
+           size = 0.25) + 
+  ylab("Proportion") +
+  scale_fill_manual(values=rev(getPalette(colorCount)))+ 
+  
+  labs(fill = expression(paste(italic("ITS2"), " sequence"))) +
+  guides(fill = guide_legend(ncol = 9, reverse = TRUE)) +
+  facet_grid(Depth_zone ~ Sample_site, scales = "free_x") + #faceting plots by Depth and Site
+  theme_bw()
+
+its2SeqPlot = its2SeqPlotA +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(color = "black", size = 12),
+        axis.text.y = element_text(color = "black", size = 12),
+        legend.position = "bottom",
+        legend.justification = "left",
+        legend.direction = "horizontal",
+        legend.title = element_text(color = "black", size = 12, hjust = 0.5, angle = 90),
+        legend.text = element_text(color = "black", size = 10),
+        legend.key = element_blank(),
+        legend.key.size = unit(0.4,"line"),
+        legend.background = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        plot.background = element_blank(),
+        strip.text.x = element_text(size = 12),
+        strip.text.y = element_text(size = 12),
+        strip.background = element_rect(fill = "white", size = 0.9)
+  )
+
+its2SeqPlot
+```
+<br><br>
+
+## Save the barplot
+```{r, save barplot, results = 'hide'}
+ggsave("its2SeqBarPlot.tiff", plot = its2SeqPlot, width = 8.5, height = 8.5, unit = "in", 
+       dpi = 300)
+```
+
+```{r, sequence plot, echo = FALSE, fig.width = 8, fig.height = 6}
+plot(its2SeqPlot)
+```
+<br><br>
+
+# *ITS2* type profiles
+***
+We can now look at the *ITS2* type profiles predicted by SymPortal.
+
+## Prepare *ITS2* type profile data
+Similar to what we did with the sequence data
+
+```{r, profile data prep, results = 'hide'}
+its2Profs = read.delim("62_20190310_DBV_2019-03-11_01-11-25.167036.profiles.absolute.clean.txt", header = TRUE, check.names = FALSE)
+head(its2Profs)
+
+its2Profs$Depth_zone = factor(its2Profs$Depth_zone, levels = c("10", "16", "25", "35"))
+levels(its2Profs$Depth_zone)
+
+its2Profs$Sample_site = factor(its2Profs$Sample_site, levels(its2Profs$Sample_site)[c(4, 2, 3, 1)])
+its2Profs = its2Profs[order(its2Profs$Sample_site, its2Profs$Depth_zone), ]
+
+sampleCounts = plyr::count(its2Profs, c('Sample_site','Depth_zone'))
+meltedList = reshape2::melt(lapply(sampleCounts$freq,function(x){c(1:x)}))
+its2Profs$barPlotOrder = meltedList$value
+its2Profs=its2Profs[c(1,ncol(its2Profs),2:(ncol(its2Profs)-1))]
+```
+```{r, }
+head(its2Profs)
+```
+<br><br>
+
+## Normalization of *ITS2* type profile reads
+Similar to what we did with the *ITS2* sequences, but we won't purge any low abundance reads, since we only have 13 total *ITS2* type profiles.
+
+```{r, profile normalization, results = 'hide'}
+its2ProfsTransposed = t(its2Profs[, 5:length(its2Profs[1, ])])
+its2ProfsList = DGEList(counts = its2ProfsTransposed)
+head(its2ProfsList$samples)
+
+its2ProfsNorm =  calcNormFactors(its2ProfsList, method = "TMM")
+head(its2ProfsNorm$samples)
+its2TMM = t(cpm(its2ProfsNorm, normalized.lib.sizes = TRUE))
+its2ProfsNorm = cbind(its2Profs[,c(1:4)], its2TMM)
+```
+```{r, profnorm2}
+head(its2ProfsNorm)
+```
+<br><br>
+
+## Preparing *ITS2* type profiles for plotting
+
+```{r, prepare profiles for plotting}
+colOrder2 = order(colSums(its2ProfsNorm[5:length(its2ProfsNorm[1,])]), decreasing = TRUE) + 4
+
+its2ProfsPerc = cbind(its2ProfsNorm[,c(1:4)],its2ProfsNorm[,c(colOrder2)])
+its2ProfsPerc$sum = apply(its2ProfsPerc[, c(5:length(its2ProfsPerc[1,]))], 1, function(x) {
+  sum(x, na.rm = T)
+})
+
+its2ProfsPerc = cbind(its2ProfsPerc[, c(1:4)], (its2ProfsPerc[, c(5:(ncol(its2ProfsPerc)-1))] 
+                                              / its2ProfsPerc$sum))
+head(its2ProfsPerc)
+
+apply(its2ProfsPerc[, c(5:(ncol(its2ProfsPerc)))], 1, function(x) {
+  sum(x, na.rm = T)
+})
+```
+Again, everything looks good!
+<br>
+
+```{r, prepare profiles for plotting 2, results = 'hide'}
+gssProf = otuStack(its2ProfsPerc, count.columns = c(5:length(its2ProfsPerc[1, ])),
+               condition.columns = c(1:4))[1:3133,] # remove summ rows
+
+levels(gssProf$otu)
+
+levels(gssProf$Depth_zone)
+levels(gssProf$Depth_zone) = c("10 m", "16 m", "25 m", "35 m")
+levels(gssProf$Sample_site)
+levels(gssProf$Sample_site) = c("Tobacco Reef", "Raph's Wall", "South Reef", "Glover's Reef")
+levels(gssProf$Depth_zone)
+levels(gssProf$Sample_site)
+```
+<br><br>
+
+## Consruct *ITS2* type profile barplot
+
+```{r, construct profile barplot, fig.show = 'hide'}
+colorCount2 = length(c(4:length(its2ProfsPerc[1,]))) +1
+getPalette2 = colorRampPalette(redmonder.pal(8, "qPBI"))
+
+its2ProfsPlotA = ggplot(gssProf, aes(x = barPlotOrder, y = count, fill = factor(otu))) +
+  geom_bar(position = "stack", stat = "identity", color = "black",
+           size = 0.25) + 
+  ylab("Proportion") +
+  scale_fill_manual(values = getPalette2(colorCount2)[2:14])+
+  labs(fill = expression(paste(italic("ITS2"), " type profile"))) +
+  guides(fill = guide_legend(ncol = 2, reverse = FALSE)) +
+  facet_grid(Depth_zone ~ Sample_site, scales = "free_x") + #faceting plots by Depth and Site
+  theme_bw()
+
+its2ProfsPlot = its2ProfsPlotA +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(color = "black", size = 12),
+        axis.text.y = element_text(color = "black", size = 12),
+        legend.position = "bottom",
+        legend.title = element_text(color = "black", size = 12, hjust = 0.5, angle = 90),
+        legend.text = element_text(color = "black", size = 10),
+        legend.key = element_blank(),
+        legend.key.size = unit(0.75,"line"),
+        legend.background = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        plot.background = element_blank(),
+        strip.text.x = element_text(size = 12),
+        strip.text.y = element_text(size = 12),
+        strip.background = element_rect(fill = "white", size = 0.9)
+  )
+
+its2ProfsPlot
+```
+<br><br>
+
+## Save *ITS2* type profile barplot
+
+```{r, save profile barplot}
+ggsave("its2ProfBarPlot.tiff", plot = its2ProfsPlot, width = 8.5, height = 8.5, unit = "in", 
+       dpi = 300)
+```
+
+```{r, profile plot, echo = FALSE, fig.width = 8, fig.height = 6}
+plot(its2ProfsPlot)
+```
+
+# Statistical analyses on *ITS2* type profiles
+***
+## Cheking dispersion with PERMDISP
+Using ```betadisper()``` in *vegan* to look at multivariate homogeneity of dispersion (PERMDISP) between sites and depths. This is using Bray-Curtis dissimilarity.
+
+```{r, betadispersion by site}
+set.seed(694) #setting seed allows repetition of randomized processes
+
+its2dispS = betadisper(vegdist(its2ProfsNorm[, c(5:ncol(its2ProfsNorm))]), its2ProfsNorm$Sample_site)
+
+anova(its2dispS)
+```
+No significant effect of Site on betadiversity.<br>
+
+```{r, betadispersion by depth}
+set.seed(694)
+
+its2dispD = betadisper(vegdist(its2ProfsNorm[, c(6:ncol(its2ProfsNorm))]), its2ProfsNorm$Depth_zone)
+
+anova(its2dispD)
+```
+Depth does significantly affect beta diversity.<br>
+<br>
+
+### Permutation test for pairwise comparisons
+Follow up with a permutation test to see where differences occur.
+
+```{r, permutation test}
+set.seed(694)
+
+its2PermTest = permutest(its2dispD, permutations = 9999, pairwise = T, model = "full", )
+its2PermTest
+```
+<br>
+```{r, permutest stats}
+its2PermTest$statistic
+```
+<br><br>
+
+## Running PERMANOVA in R
+Now let's see how different communities are from each other with PERMANOVA.
+We will utilize the ```adonis()``` function in *vegan*.
+We will use Bray-Curtis similarity for our distance matrix and run a total 0f 9,999 permutations, and test the effects of Site, Depth, and the interaction between Site and Depth. Dispersion is heteroschedastic, but PERMANOVA is robust to deviations in 
+homgeneity of variance ( [Anderson and Walsh, 2013](https://esajournals.onlinelibrary.wiley.com/doi/10.1890/12-2010.1){target="_blank"})
+
+```{r, permanova}
+set.seed(694)
+its2Adonis = adonis(its2ProfsNorm[, c(5:ncol(its2ProfsNorm))] ~ Depth_zone * Sample_site, 
+data = its2ProfsNorm, permutations = 9999, method = "bray")
+
+its2Adonis
+```
+PERMANOVA reveals that **Depth** has a signifcant effect on Symbiodiniaceae associations in our *M. cavernosa* samples.<br><br>
+
+### Pairwise PERMANOVA for multiple comparisons
+Since we found that Depth was a significant factor in our PERMANOVA we can now use pairwise PERMANOVA to reveal where differences occur across depth.
+This utilizes the package *pairwiseAdonis*, where we will again use Bray-Curtis similarity and 9,999 permutations. We also have added false discovery rate (FDR) corrections since we are perfoming multiple comparisons.
+```{r, pairwise permanova}
+set.seed(694)
+its2PWAdonis = pairwise.adonis(its2ProfsNorm[, c(5:ncol(its2ProfsNorm))],
+                               factors = its2ProfsNorm$Depth_zone,
+                               sim.method = "bray", p.adjust.m = "BH", perm = 9999)
+                
+its2PWAdonis          
+```
+We see that again see differences between our deeper (25 + 35 m) and shallower (10 + 16 m) samples.<br><br>
+
+## PERMANOVA without 35 m samples
+First we need to remove the deep samples from the dataframe. We will use our dataframe of profiles that haven't been normalized yet. This way we can calculate the normalization based on only the samples we are keeping in the analysis.
+
+```{r, remove deep samples, results = 'hide'}
+its2Profs2 = subset(its2Profs, !Depth_zone=="35")
+its2Profs2[] = lapply(its2Profs2, function(x) if(is.factor(x)) factor(x) else x)
+summary(its2Profs2)
+```
+```{r, no deep}
+head(its2Profs2)
+```
+<br>
+Normalize samples again, as above.
+
+```{r, renormalize, results = 'hide'}
+its2ProfsTransposed2 = t(its2Profs2[, 5:length(its2Profs2[1, ])])
+its2ProfsList2 = DGEList(counts = its2ProfsTransposed2)
+head(its2ProfsList2$samples)
+
+its2ProfsNorm2 =  calcNormFactors(its2ProfsList2, method = "TMM")
+head(its2ProfsNorm2$samples)
+its2TMM2 = t(cpm(its2ProfsNorm2, normalized.lib.sizes = TRUE))
+its2ProfsNorm2 = cbind(its2Profs2[,c(1:4)], its2TMM2)
+```
+```{r, renorm 2}
+head(its2ProfsNorm2)
+```
+<br>
+Run PERMANOVA on normalized subset of data
+
+```{r, permanova no 35 m}
+set.seed(694)
+its2AdonisNo35 = adonis(its2ProfsNorm2[, c(5:ncol(its2ProfsNorm2))] ~ Depth_zone * Sample_site, 
+                    data = its2ProfsNorm2, permutations = 9999, method = "bray")
+
+its2AdonisNo35
+```
+Depth is still has a significant effect on community structure
+<br>
+
+Let' see where differences lie across depth using pairwise PERMANOVA again.
+```{r, pw permanova no deep}
+set.seed(694)
+its2PWAdonisNo35 = pairwise.adonis(its2ProfsNorm2[, c(5:ncol(its2ProfsNorm2))],
+                               factors = its2ProfsNorm2$Depth_zone,
+                               sim.method = "bray", p.adjust.m = "BH", perm = 9999)
+
+its2PWAdonisNo35
+```
+The differences are still between 25 m and the shallower sites (10 + 16 m). This gives us confidence that temporal differences are not a cofactor with depth.
+<br><br>
+
+## SIMPER test between deep and shallow populations
+Similarity percentage test (SIMPER) will show us the *ITS2* type profiles that contribute the most to the dissimilarity between depth zones
+
+```{r, SIMPER, results = 'hide'}
+depths = its2ProfsNorm$Depth_zone
+levels(depths) = c("Shallow","Shallow","Deep","Deep")
+depths
+its2ProfsNorm$depth = depths
+its2ProfsNorm = cbind(its2ProfsNorm[c(1:4)],its2ProfsNorm[ncol(its2ProfsNorm)],its2ProfsNorm[c(5:(ncol(its2ProfsNorm)-1))])
+head(its2ProfsNorm)
+```
+```{r, SIMPER 2}
+its2SimperD = simper(sqrt(its2ProfsNorm[, c(6:ncol(its2ProfsNorm))]), its2ProfsNorm$depth)
+summary(its2SimperD)
+```
