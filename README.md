@@ -37,6 +37,7 @@ al. 2013](https://doi.org/10.3354/meps11369).\
 - lab_protocol
     - *barcodeMM.csv* -- Barcoding PCR mastermix recipe
     - *bcPCR.csv* -- Barcoding PCR profile
+    - *bcPrimers.csv* -- Barcoding PCR primer sequence example
     - *ctab.csv* -- CTAB extraction buffer recipe
     - *etbrGel.csv* -- Ethidium bromide gel recipe
     - *index.html* -- Symbiodiniaceae lab prorocol webpage
