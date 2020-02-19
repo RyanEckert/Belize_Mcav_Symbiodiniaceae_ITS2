@@ -16,10 +16,9 @@ Reef. Front Micro**
 
 ------------------------------------------------------------------------
 
-Protocols adapted from [Meiog et
+Lab protocols adapted from [Meiog et
 al. 2009](https://doi.org/10.1111/j.1755-0998.2008.02222.x); [Klepac et
 al. 2013](https://doi.org/10.3354/meps11369).\
-<br><br>
 
 ------------------------------------------------------------------------
 
