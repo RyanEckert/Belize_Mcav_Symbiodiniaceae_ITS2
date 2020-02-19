@@ -20,7 +20,7 @@ al. 2013](https://doi.org/10.3354/meps11369).\
 
 ------------------------------------------------------------------------
 
-##### Protocols and walkthroughs accompanying this manuscript:
+#### Protocols and walkthroughs accompanying this manuscript:
 
 1.  [Protocol for DNA extraction and ITS2
     amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol/)
@@ -31,7 +31,7 @@ al. 2013](https://doi.org/10.3354/meps11369).\
 
 #### Repsitory contents:
 
--lab_protocol
+##### - lab_protocol
 *barcodeMM.csv* -- Barcoding PCR mastermix recipe
 *bcPCR.csv* -- Barcoding PCR cycling profile
 *ctab.csv* -- CTAB extraction buffer recipe
