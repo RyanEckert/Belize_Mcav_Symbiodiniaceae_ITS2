@@ -1604,8 +1604,8 @@ div.tocify {
 </div>
 
 
-<div id="version-february-13-2020" class="section level4">
-<h4>version: February 13, 2020</h4>
+<div id="version-february-19-2020" class="section level4">
+<h4>version: February 19, 2020</h4>
 </div>
 <div id="github-repository" class="section level4">
 <h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
@@ -1633,7 +1633,7 @@ div.tocify {
 <div id="loading-required-packages" class="section level2">
 <h2>Loading required packages</h2>
 <p>For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.</p>
-<pre class="r"><code>setwd(&quot;~/Documents/HBOI/Carrie_Bow/Data/Zoox/SymPortal/data_analysis&quot;)
+<pre class="r"><code>setwd(&quot;~/Documents/GitHub/Symbiodiniaceae-ITS2/stats&quot;)
 
 if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;)
 pacman::p_load(&quot;ggplot2&quot;, &quot;dplyr&quot;, &quot;reshape2&quot;, &quot;MCMC.OTU&quot;, &quot;vegan&quot;, &quot;edgeR&quot;, 
@@ -1656,6 +1656,13 @@ options(&quot;scipen&quot; = 10)</code></pre>
 <h2>Loading <em>ITS2</em> sequence data into R</h2>
 <p>First, we need to load in the data from <em>SymPortal</em> analysis and clean it up in R. We can order sites from north to south so later data can be plotted shallow to deep; north to south. To do this we can set “Depth_zone” and “Sample_site” as factors and define the order of the factors.</p>
 <pre class="r"><code>its2Seq = read.delim(&quot;62_20190310_DBV_2019-03-11_01-11-25.167036.seqs.absolute.clean.txt&quot;, header = TRUE, check.names = FALSE)
+head(its2Seq)
+
+its2MetaData = read.delim(&quot;CBC_MCAV_sampling_metadata.txt&quot;, header = TRUE, check.names = FALSE)
+head(its2MetaData)
+
+its2Seq = cbind(its2Seq[1], its2MetaData[,2:3], its2Seq[,c(2:length(its2Seq))])
+colnames(its2Seq)[3] = &quot;Depth_zone&quot;
 head(its2Seq)
 
 its2Seq$Depth_zone = factor(its2Seq$Depth_zone, levels = c(&quot;10&quot;, &quot;16&quot;, &quot;25&quot;, &quot;35&quot;))
@@ -1882,11 +1889,16 @@ its2SeqPlot</code></pre>
 <pre class="r"><code>its2Profs = read.delim(&quot;62_20190310_DBV_2019-03-11_01-11-25.167036.profiles.absolute.clean.txt&quot;, header = TRUE, check.names = FALSE)
 head(its2Profs)
 
+its2Profs = cbind(its2Profs[1], its2MetaData[,2:3], its2Profs[,c(2:length(its2Profs))])
+colnames(its2Profs)[3] = &quot;Depth_zone&quot;
+head(its2Profs)
+
 its2Profs$Depth_zone = factor(its2Profs$Depth_zone, levels = c(&quot;10&quot;, &quot;16&quot;, &quot;25&quot;, &quot;35&quot;))
 levels(its2Profs$Depth_zone)
 
 its2Profs$Sample_site = factor(its2Profs$Sample_site, levels(its2Profs$Sample_site)[c(4, 2, 3, 1)])
 its2Profs = its2Profs[order(its2Profs$Sample_site, its2Profs$Depth_zone), ]
+head(its2Profs)
 
 sampleCounts = plyr::count(its2Profs, c(&#39;Sample_site&#39;,&#39;Depth_zone&#39;))
 meltedList = reshape2::melt(lapply(sampleCounts$freq,function(x){c(1:x)}))

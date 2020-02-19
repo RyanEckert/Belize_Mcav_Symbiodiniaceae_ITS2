@@ -2,15 +2,15 @@
 title: "Symbiodiniaceae *ITS2* analyses"
 author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     theme: flatly
     code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 ```{r, setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, fig.align = 'left')
@@ -40,7 +40,7 @@ The data used for this analysis are calculated with *SymPortal* . The raw Symbio
 For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
-setwd("~/Documents/HBOI/Carrie_Bow/Data/Zoox/SymPortal/data_analysis")
+setwd("~/Documents/GitHub/Symbiodiniaceae-ITS2/stats")
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("ggplot2", "dplyr", "reshape2", "MCMC.OTU", "vegan", "edgeR", 
@@ -63,6 +63,13 @@ First, we need to load in the data from *SymPortal* analysis and clean it up in 
 We can order sites from north to south so later data can be plotted shallow to deep; north to south. To do this we can set "Depth_zone" and "Sample_site" as factors and define the order of the factors.
 ```{r, SymPortal sequence data, results='hide'}
 its2Seq = read.delim("62_20190310_DBV_2019-03-11_01-11-25.167036.seqs.absolute.clean.txt", header = TRUE, check.names = FALSE)
+head(its2Seq)
+
+its2MetaData = read.delim("CBC_MCAV_sampling_metadata.txt", header = TRUE, check.names = FALSE)
+head(its2MetaData)
+
+its2Seq = cbind(its2Seq[1], its2MetaData[,2:3], its2Seq[,c(2:length(its2Seq))])
+colnames(its2Seq)[3] = "Depth_zone"
 head(its2Seq)
 
 its2Seq$Depth_zone = factor(its2Seq$Depth_zone, levels = c("10", "16", "25", "35"))
@@ -213,11 +220,16 @@ Similar to what we did with the sequence data
 its2Profs = read.delim("62_20190310_DBV_2019-03-11_01-11-25.167036.profiles.absolute.clean.txt", header = TRUE, check.names = FALSE)
 head(its2Profs)
 
+its2Profs = cbind(its2Profs[1], its2MetaData[,2:3], its2Profs[,c(2:length(its2Profs))])
+colnames(its2Profs)[3] = "Depth_zone"
+head(its2Profs)
+
 its2Profs$Depth_zone = factor(its2Profs$Depth_zone, levels = c("10", "16", "25", "35"))
 levels(its2Profs$Depth_zone)
 
 its2Profs$Sample_site = factor(its2Profs$Sample_site, levels(its2Profs$Sample_site)[c(4, 2, 3, 1)])
 its2Profs = its2Profs[order(its2Profs$Sample_site, its2Profs$Depth_zone), ]
+head(its2Profs)
 
 sampleCounts = plyr::count(its2Profs, c('Sample_site','Depth_zone'))
 meltedList = reshape2::melt(lapply(sampleCounts$freq,function(x){c(1:x)}))
