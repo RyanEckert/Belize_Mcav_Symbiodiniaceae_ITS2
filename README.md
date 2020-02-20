@@ -1,9 +1,10 @@
 Symbiodiniaceae *ITS2* amplicon sequencing
 ==========================================
+[![DOI](https://zenodo.org/badge/105710728.svg)](https://zenodo.org/badge/latestdoi/105710728)
 
 ### Ryan Eckert -- <ryan.j.eckert@gmail.com>
 
-### version: February 13, 2020
+### version: February 19, 2020
 
 ------------------------------------------------------------------------
 This repository contains scripts and data associated with the
