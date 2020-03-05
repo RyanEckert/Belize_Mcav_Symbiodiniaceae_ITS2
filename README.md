@@ -10,10 +10,8 @@ Symbiodiniaceae *ITS2* amplicon sequencing
 This repository contains scripts and data associated with the
 publication: 
 
-**Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss
-JD (in review) Symbiodiniaceae associations among *Montastraea
-cavernosa* populations along a depth gradient on the Belize Barrier
-Reef. Front Micro**
+**Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD (2020). Depth influences 
+Symbiodiniaceae associations among *Montastraea cavernosa* corals on the Belize Barrier Reef. Front Micro**
 
 ------------------------------------------------------------------------
 
