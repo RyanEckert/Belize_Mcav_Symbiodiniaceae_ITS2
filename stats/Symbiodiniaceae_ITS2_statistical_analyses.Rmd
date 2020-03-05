@@ -23,7 +23,7 @@ library(magrittr)
 # About this document
 ***
 #### All analyses preformed with R version `r getRversion()`.
-This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(in review) Symbiodiniaceae community variation among Montastraea cavernosa populations along a depth gradient on the Belize Barrier Reef](){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [GitHub](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
+This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD (2020) Depth influences Symbiodiniaceae associations among Montastraea cavernosa corals on the Belize Barrier Reef. Front Micro](){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [GitHub](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
 
 If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).   
   
