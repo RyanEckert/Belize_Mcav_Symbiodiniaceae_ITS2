@@ -27,10 +27,9 @@ al. 2013](https://doi.org/10.3354/meps11369).
 
 #### Protocols and walkthroughs accompanying this manuscript:
 
-1.  [Protocol for DNA extraction and ITS2
+1.  [Protocol for DNA extraction and *ITS2*
     amplification](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/lab_protocol/)
-2.  [Statistical analysis of sequencing
-    reads](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats/)
+2.  [Statistical analysis of *SymPortal* output](https://ryaneckert.github.io/Belize_Mcav_Symbiodiniaceae_ITS2/stats/)
 
 ------------------------------------------------------------------------
 
@@ -74,7 +73,7 @@ al. 2013](https://doi.org/10.3354/meps11369).
     - *index.html* -- Symbiodiniaceae statistical analysis webpage
     - *its2Primer.pwk* -- PRIMER7 workbook
     - *stats.Rproj* -- R project file
-    
+- *.gitignore* -- .gitignore file    
 - *CBC_MCAV_Symbiodiniaceae_ITS2_metadata.xlsx* -- *M. cavernosa* sample and library prep metadata
 - *README.md* -- Repository readme document
 - *Symbiodiniaceae_ITS2_primers_PCR.xlsx* -- Symbiodiniaceae *ITS2* and barcoding primer sequences and PCR profiles
