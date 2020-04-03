@@ -73,6 +73,7 @@ al. 2013](https://doi.org/10.3354/meps11369).
     - *Symbiodiniaceae_ITS2_statistical_analyses.Rmd* -- Symbiodiniaceae statistical analysis Rmarkdown document
     - *index.html* -- Symbiodiniaceae statistical analysis webpage
     - *its2Primer.pwk* -- PRIMER7 workbook
+    - *stats.Rproj* -- R project file
     
 - *CBC_MCAV_Symbiodiniaceae_ITS2_metadata.xlsx* -- *M. cavernosa* sample and library prep metadata
 - *README.md* -- Repository readme document
