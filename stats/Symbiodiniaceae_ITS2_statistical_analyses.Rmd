@@ -4,7 +4,6 @@ author: "Ryan Eckert -- ryan.j.eckert@gmail.com"
 output:
   html_document:
     theme: flatly
-    code_folding: show
     toc: yes
     toc_depth: 3
     toc_float: yes
@@ -25,11 +24,11 @@ library(magrittr)
 # About this document
 ***
 #### All analyses preformed with R version `r getRversion()`.
-This is the code accompanies the publication [Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD (2020) Depth influences Symbiodiniaceae associations among Montastraea cavernosa corals on the Belize Barrier Reef. Front Micro](){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [GitHub](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
+This is the code accompanies the publication [Eckert RJ, Reaume AM, Sturm AB, Studivan MS and Voss JD (2020) Depth influences Symbiodiniaceae associations among *Montastraea cavernosa* corals on the Belize Barrier Reef. *Front. Microbiol.* 11:518. doi: 10.3389/fmicb.2020.00518](https://doi.org/10.3389/fmicb.2020.00518){target="_blank"}. Here you will find all the code to repeat the statistical analyses performed for this manuscript. All of the accompanying data can be found on my [GitHub](https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2/tree/master/stats){target="_blank"}.  
 
-If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (ie. ```setwd("~/path/to/directory/with/data")```).   
+If you download my entire accompanying github directory you should be able to re-run these analyses by following along with the code chunks in R Studio. If you download the code separtely or you are using this pipeline on your own data, you may need to change the working directory to where the associated files are housed (i.e. ```setwd("~/path/to/directory/with/data")```).   
   
-The data used for this analysis are calculated with *SymPortal* . The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [PRJNA579363](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA579363){target="_blank"}. Hopefully you are able to follow along this file and find it useful to use with your own data!<br>
+The data used for this analysis are calculated with *SymPortal* . The raw Symbiodiniaceae *ITS2* sequences obtained from *Montastraea cavernosa* samples can be found in the NCBI SRA under project number [PRJNA579363](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA579363){target="_blank"}. Hopefully you are able to follow along with this file and find it useful to use with your own data!<br>
 
 #### Additional protocols:<br>
 
@@ -42,8 +41,6 @@ The data used for this analysis are calculated with *SymPortal* . The raw Symbio
 For the following analyses we will require the use of a number of different R packages. Most of these can be sourced from CRAN, but a couple need to be downloaded from GitHub or BioConducter. We can use the following code to quickly load in the packages and install any packages not previously installed in the R console.
 
 ```{r, load packages, include = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
-setwd("~/Documents/GitHub/Symbiodiniaceae-ITS2/stats")
-
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("ggplot2", "dplyr", "reshape2", "MCMC.OTU", "vegan", "edgeR", 
                "pairwiseAdonis", "RColorBrewer", "Redmonder")
@@ -202,8 +199,7 @@ its2SeqPlot
 
 ## Save the barplot
 ```{r, save barplot, results = 'hide'}
-ggsave("its2SeqBarPlot.tiff", plot = its2SeqPlot, width = 8.5, height = 8.5, unit = "in", 
-       dpi = 300)
+ggsave("../figures/Fig3.eps", plot = its2SeqPlot, width = 8.5, height = 8.5, unit = "in", dpi = 600)
 ```
 
 ```{r, sequence plot, echo = FALSE, fig.width = 8, fig.height = 6}
@@ -340,13 +336,13 @@ its2ProfsPlot
 ## Save *ITS2* type profile barplot
 
 ```{r, save profile barplot}
-ggsave("its2ProfBarPlot.tiff", plot = its2ProfsPlot, width = 8.5, height = 8.5, unit = "in", 
-       dpi = 300)
+ggsave("../figures/Fig4.eps", plot = its2ProfsPlot, width = 8.5, height = 8.5, unit = "in", dpi = 600)
 ```
 
 ```{r, profile plot, echo = FALSE, fig.width = 8, fig.height = 6}
 plot(its2ProfsPlot)
 ```
+<br><br>
 
 # Statistical analyses on *ITS2* type profiles
 ***

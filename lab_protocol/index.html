@@ -1281,66 +1281,6 @@ window.buildTabsets = function(tocID) {
 };
 
 </script>
-<script>
-window.initializeCodeFolding = function(show) {
-
-  // handlers for show-all and hide all
-  $("#rmd-show-all-code").click(function() {
-    $('div.r-code-collapse').each(function() {
-      $(this).collapse('show');
-    });
-  });
-  $("#rmd-hide-all-code").click(function() {
-    $('div.r-code-collapse').each(function() {
-      $(this).collapse('hide');
-    });
-  });
-
-  // index for unique code element ids
-  var currentIndex = 1;
-
-  // select all R code blocks
-  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia');
-  rCodeBlocks.each(function() {
-
-    // create a collapsable div to wrap the code in
-    var div = $('<div class="collapse r-code-collapse"></div>');
-    if (show || $(this)[0].classList.contains('fold-show'))
-      div.addClass('in');
-    var id = 'rcode-643E0F36' + currentIndex++;
-    div.attr('id', id);
-    $(this).before(div);
-    $(this).detach().appendTo(div);
-
-    // add a show code button right above
-    var showCodeText = $('<span>' + (show ? 'Hide' : 'Code') + '</span>');
-    var showCodeButton = $('<button type="button" class="btn btn-default btn-xs code-folding-btn pull-right"></button>');
-    showCodeButton.append(showCodeText);
-    showCodeButton
-        .attr('data-toggle', 'collapse')
-        .attr('data-target', '#' + id)
-        .attr('aria-expanded', show)
-        .attr('aria-controls', id);
-
-    var buttonRow = $('<div class="row"></div>');
-    var buttonCol = $('<div class="col-md-12"></div>');
-
-    buttonCol.append(showCodeButton);
-    buttonRow.append(buttonCol);
-
-    div.before(buttonRow);
-
-    // update state of button on show/hide
-    div.on('hidden.bs.collapse', function () {
-      showCodeText.text('Code');
-    });
-    div.on('show.bs.collapse', function () {
-      showCodeText.text('Hide');
-    });
-  });
-
-}
-</script>
 <style type="text/css">.hljs-literal {
 color: #990073;
 }
@@ -1505,9 +1445,6 @@ summary {
 </style>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
 
 
 
@@ -1597,14 +1534,6 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
-
 
 
 <h1 class="title toc-ignore">Symbiodiniaceae <em>ITS2</em> sequencing library preparation</h1>
@@ -1613,8 +1542,10 @@ div.tocify {
 </div>
 
 
-<div id="version-march-05-2020" class="section level4">
-<h4>version: March 05, 2020</h4>
+<a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#2C3E50; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+<style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="version-april-03-2020" class="section level4">
+<h4>version: April 03, 2020</h4>
 </div>
 <div id="github-repository" class="section level4">
 <h4><a href="https://github.com/RyanEckert/Belize_Mcav_Symbiodiniaceae_ITS2.git" target="_blank">GitHub repository</a></h4>
@@ -1622,7 +1553,7 @@ div.tocify {
 </div>
 <div id="about-this-document" class="section level1">
 <h1>About this document</h1>
-<p>This protocol is used to extract high quality genomic DNA from both coral host and Symbiodiniaceae spp. The resulting DNA should be sufficient for downstream PCR and high-thoughout sequencing. This protocol was utilized to examine Symbiodiniaceae community structure across depth through <em>ITS2</em> metabarcoding in <strong>Eckert RJ, Reaume A, Sturm AB, Studivan MS, and Voss JD.(2020) Depth influences Symbiodiniaceae associations among Montastraea cavernosa corals on the Belize Barrier Reef. Front Micro</strong></p>
+<p>This protocol is used to extract high quality genomic DNA from both coral host and Symbiodiniaceae spp. The resulting DNA should be sufficient for downstream PCR and high-thoughout sequencing. This protocol was utilized to examine Symbiodiniaceae community structure across depth through <em>ITS2</em> metabarcoding in <a href="https://doi.org/10.3389/fmicb.2020.00518" target="_blank">Eckert RJ, Reaume AM, Sturm AB, Studivan MS and Voss JD (2020) Depth influences Symbiodiniaceae associations among <em>Montastraea cavernosa</em> corals on the Belize Barrier Reef. <em>Front. Microbiol.</em> 11:518. doi: 10.3389/fmicb.2020.00518</a>.</p>
 <p>Additionally, the DNA extraction and clean-up were used in <a href="https://doi.org/10.1038/s41598-019-43479-x" target="_blank">Eckert, R. J., Studivan, M. S., and Voss, J. D. (2019). Populations of the coral species <em>Montastraea cavernosa</em> on the Belize Barrier Reef lack vertical connectivity. Sci. Rep. 9, 7200.</a> to examine coral host population genetic structure.<br><br></p>
 </div>
 <div id="ctab-gdna-extraction-protocol" class="section level1">
@@ -2624,11 +2555,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 <script>
 $(document).ready(function ()  {
