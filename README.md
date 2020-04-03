@@ -14,10 +14,15 @@ publication:
 Symbiodiniaceae associations among *Montastraea cavernosa* corals on the Belize Barrier Reef. Front Micro**
 
 ------------------------------------------------------------------------
+In Belize, shallow populations (10 and 16 m) of the coral species Montastraea cavernosa from the back reef and reef crest are genetically differentiated from deeper populations on the fore reef and reef wall (25 and 35 m). Like many species of scleractinian corals, M. cavernosa has an obligate symbiosis with dinoflagellate microalgae from the family Symbiodiniaceae. Here, we describe the Symbiodiniaceae taxa found within previously-sampled and genotyped M. cavernosa populations along a depth gradient on the Belize Barrier Reef by implementing high-throughput sequencing of the ITS2 region of Symbiodiniaceae ribosomal DNA and the SymPortal analysis framework. While Symbiodiniaceae ITS2 type profiles across all sampling depths were almost entirely (99.99%) from the genus Cladocopium (formerly Symbiodinium Clade C), shallow (10 and 16 m) populations had a greater diversity of ITS2 type profiles in comparison to deeper (25 and 35 m) populations. Permutational multivariate analysis of variance (PERMANOVA) confirmed significant differences in ITS2 type profiles between shallow and deep sample populations. Overall Symbiodiniaceae communities changed significantly with depth, following patterns similar to the coral host’s population genetic structure. Though physiological differences among species in the cosmopolitan genus Cladocopium are not well-described, our results suggest that although some members of Cladocopium are depth-generalists, shallow M. cavernosa populations in Belize may harbor shallow-specialized Symbiodiniaceae not found in deeper populations.
+
+<img src="../figures/Fig1.png" width="425"/> <img src="../figures/Fig2.png" width="425"/> 
+
+------------------------------------------------------------------------
 
 Lab protocols adapted from [Meiog et
 al. 2009](https://doi.org/10.1111/j.1755-0998.2008.02222.x); [Klepac et
-al. 2013](https://doi.org/10.3354/meps11369).\
+al. 2013](https://doi.org/10.3354/meps11369).
 
 ------------------------------------------------------------------------
 
@@ -31,7 +36,15 @@ al. 2013](https://doi.org/10.3354/meps11369).\
 ------------------------------------------------------------------------
 
 #### Repsitory contents:
-
+- figures
+    -
+    -
+    -
+    -
+    -
+    -
+    -
+    
 - lab_protocol
     - *barcodeMM.csv* -- Barcoding PCR mastermix recipe
     - *bcPCR.csv* -- Barcoding PCR profile
@@ -57,7 +70,7 @@ al. 2013](https://doi.org/10.3354/meps11369).\
     - *62_20190310_DBV_2019-03-11_01-11-25.167036.seqs.absolute.txt* -- *SymPortal* *ITS2* sequence absolute abundance output file
     - *62_20190310_DBV_2019-03-11_01-11-25.167036.seqs.relative.txt* -- *SymPortal* *ITS2* sequence relative abundance output file
     - *CBC_MCAV_sampling_metadata.txt* -- *M. cavernosa* sample metadata
-    - *Simbiodiniaceae_ITS2_statistical_analyses.Rmd* -- Symbiodiniaceae statistical analysis Rmarkdown document
+    - *Symbiodiniaceae_ITS2_statistical_analyses.Rmd* -- Symbiodiniaceae statistical analysis Rmarkdown document
     - *index.html* -- Symbiodiniaceae statistical analysis webpage
     - *its2Primer.pwk* -- PRIMER7 workbook
     
