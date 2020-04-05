@@ -6,3 +6,6 @@
 figures/ai
 stats/index.Rmd
 lab_protocol/*.Rmd
+stats/Symbiodiniaceae_ITS2_statistical_analyses.html
+stats/symPortalAnalysis.R
+lab_protocol/Symbiodiniaceae_ITS2_library_prep.html
